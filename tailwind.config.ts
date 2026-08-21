@@ -1,0 +1,75 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: ['class'],
+  content: [
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
+      },
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+        popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
+        primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+        secondary: { DEFAULT: 'hsl(var(--secondary))', foreground: 'hsl(var(--secondary-foreground))' },
+        muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
+        accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
+        destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        // Apple system colors
+        'apple-blue': '#007AFF',
+        'apple-green': '#34C759',
+        'apple-red': '#FF3B30',
+        'apple-orange': '#FF9500',
+        'apple-yellow': '#FFCC00',
+        'apple-purple': '#AF52DE',
+        'apple-pink': '#FF2D55',
+        'apple-teal': '#5AC8FA',
+        'apple-indigo': '#5856D6',
+        'apple-gray': {
+          1: '#8E8E93',
+          2: '#AEAEB2',
+          3: '#C7C7CC',
+          4: '#D1D1D6',
+          5: '#E5E5EA',
+          6: '#F2F2F7',
+        },
+      },
+      borderRadius: {
+        lg: '12px',
+        xl: '16px',
+        '2xl': '20px',
+        '3xl': '28px',
+      },
+      boxShadow: {
+        'apple-sm': '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+        'apple': '0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+        'apple-lg': '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+        'apple-xl': '0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)',
+      },
+      keyframes: {
+        'slide-up': { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        'slide-down': { from: { opacity: '0', transform: 'translateY(-8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        'scale-in': { from: { opacity: '0', transform: 'scale(0.96)' }, to: { opacity: '1', transform: 'scale(1)' } },
+        'shimmer': { from: { backgroundPosition: '-200% 0' }, to: { backgroundPosition: '200% 0' } },
+      },
+      animation: {
+        'slide-up': 'slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-down': 'slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in': 'fade-in 0.2s ease-out',
+        'scale-in': 'scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        'shimmer': 'shimmer 2s infinite linear',
+      },
+    },
+  },
+  plugins: [require('tailwindcss-animate')],
+}
