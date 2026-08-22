@@ -1,15 +1,16 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { PageHeader } from '@/components/layout/page-header'
-import { Card, CardContent } from '@/components/ui/card'
-import { TrendingUp, Newspaper, ExternalLink, RefreshCw, Info } from 'lucide-react'
+import { TrendingUp, Newspaper, ExternalLink, RefreshCw, Info, Wifi, WifiOff } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 interface Indicator {
   name: string
   value: string
   date: string
   description: string
+  live?: boolean
 }
 
 interface NewsItem {
@@ -22,6 +23,8 @@ interface NewsItem {
 interface MarketData {
   indicators: Indicator[]
   news: NewsItem[]
+  newsSource?: string
+  fetchedAt?: string
 }
 
 const INDICATOR_COLORS: Record<string, string> = {
@@ -40,17 +43,20 @@ export default function InvestmentsPage() {
   const [data, setData] = useState<MarketData | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedIndicator, setExpandedIndicator] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
-  async function load() {
-    setLoading(true)
+  async function load(showRefresh = false) {
+    if (showRefresh) setRefreshing(true)
+    else setLoading(true)
     try {
-      const res = await fetch('/api/market-data')
-      const json = await res.json()
-      setData(json)
-    } catch {
-      // fail silently
-    }
+      const res = await fetch('/api/market-data', { cache: 'no-store' })
+      if (res.ok) {
+        const json = await res.json()
+        setData(json)
+      }
+    } catch { /* silent */ }
     setLoading(false)
+    setRefreshing(false)
   }
 
   useEffect(() => { load() }, [])
@@ -62,10 +68,14 @@ export default function InvestmentsPage() {
         large
         right={
           <button
-            onClick={load}
-            className="p-2 rounded-xl bg-secondary text-muted-foreground hover:text-foreground pressable"
+            onClick={() => load(true)}
+            className={cn(
+              'p-2 rounded-xl bg-secondary text-muted-foreground hover:text-foreground pressable',
+              refreshing && 'opacity-50'
+            )}
+            disabled={refreshing}
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
           </button>
         }
       />
@@ -74,66 +84,68 @@ export default function InvestmentsPage() {
 
         {/* Indicadores */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Indicadores do momento
-            </p>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Indicadores
+              </p>
+            </div>
+            {data && (
+              <div className="flex items-center gap-1">
+                {data.indicators[0]?.live
+                  ? <><Wifi className="w-3 h-3 text-[#34C759]" /><span className="text-xs text-[#34C759]">ao vivo</span></>
+                  : <><WifiOff className="w-3 h-3 text-muted-foreground" /><span className="text-xs text-muted-foreground">estimado</span></>
+                }
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 mb-2">
             {loading ? (
-              [1, 2, 3].map(i => (
-                <div key={i} className="h-24 rounded-2xl skeleton" />
-              ))
+              [1, 2, 3].map(i => <div key={i} className="h-24 rounded-2xl skeleton" />)
             ) : data?.indicators.map(ind => (
               <button
                 key={ind.name}
                 type="button"
-                onClick={() => setExpandedIndicator(
-                  expandedIndicator === ind.name ? null : ind.name
-                )}
-                className="p-3 bg-card rounded-2xl shadow-apple-sm border border-border/50 text-left pressable"
+                onClick={() => setExpandedIndicator(expandedIndicator === ind.name ? null : ind.name)}
+                className="p-3 bg-card rounded-2xl shadow-apple-sm border border-border/50 text-left pressable active:scale-95 transition-transform"
               >
                 <p className="text-lg mb-1">{INDICATOR_ICONS[ind.name]}</p>
                 <p className="text-xs text-muted-foreground font-medium">{ind.name}</p>
-                <p
-                  className="text-base font-bold mt-0.5"
-                  style={{ color: INDICATOR_COLORS[ind.name] }}
-                >
+                <p className="text-[15px] font-bold mt-0.5" style={{ color: INDICATOR_COLORS[ind.name] }}>
                   {ind.value}
                 </p>
+                {ind.date && (
+                  <p className="text-[9px] text-muted-foreground mt-0.5">{ind.date}</p>
+                )}
               </button>
             ))}
           </div>
 
-          {/* Expanded indicator explanation */}
-          {expandedIndicator && data?.indicators && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-2xl border border-blue-200 dark:border-blue-800 animate-slide-down">
-              {(() => {
-                const ind = data.indicators.find(i => i.name === expandedIndicator)
-                return ind ? (
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-0.5">
-                        O que é {ind.name}?
-                      </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-400 leading-relaxed">
-                        {ind.description}
-                      </p>
-                      {ind.date && (
-                        <p className="text-xs text-blue-500 mt-1">Atualizado em {ind.date}</p>
-                      )}
-                    </div>
+          {/* Indicator explanation */}
+          {expandedIndicator && data?.indicators && (() => {
+            const ind = data.indicators.find(i => i.name === expandedIndicator)
+            if (!ind) return null
+            return (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-2xl border border-blue-200 dark:border-blue-800 animate-slide-down">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-1">
+                      O que é {ind.name}?
+                    </p>
+                    <p className="text-sm text-blue-700 dark:text-blue-400 leading-relaxed">
+                      {ind.description}
+                    </p>
                   </div>
-                ) : null
-              })()}
-            </div>
-          )}
+                </div>
+              </div>
+            )
+          })()}
 
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Fonte: Banco Central do Brasil · Toque para entender o indicador
+            Fonte: Banco Central do Brasil · Toque para entender
           </p>
         </div>
 
@@ -150,11 +162,16 @@ export default function InvestmentsPage() {
 
         {/* Notícias */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Newspaper className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Notícias do mercado
-            </p>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Newspaper className="w-4 h-4 text-primary" />
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Notícias do mercado
+              </p>
+            </div>
+            {data?.newsSource && (
+              <span className="text-xs text-muted-foreground">{data.newsSource}</span>
+            )}
           </div>
 
           {loading ? (
@@ -166,7 +183,7 @@ export default function InvestmentsPage() {
               {data.news.map((item, i) => (
                 <a
                   key={i}
-                  href={item.link}
+                  href={item.link || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50 pressable"
@@ -181,20 +198,26 @@ export default function InvestmentsPage() {
                           {item.description}
                         </p>
                       )}
-                      <p className="text-xs text-muted-foreground mt-1.5">{item.pubDate}</p>
+                      {item.pubDate && (
+                        <p className="text-xs text-muted-foreground mt-1.5">{item.pubDate}</p>
+                      )}
                     </div>
                     <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   </div>
                 </a>
               ))}
-              <p className="text-xs text-muted-foreground text-center pt-1">
-                Fonte: InfoMoney
-              </p>
             </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Newspaper className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">Notícias indisponíveis no momento</p>
+            <div className="text-center py-10 bg-card rounded-2xl border border-border/50">
+              <Newspaper className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="text-sm text-muted-foreground">Notícias temporariamente indisponíveis</p>
+              <p className="text-xs text-muted-foreground mt-1">Tente atualizar em alguns minutos</p>
+              <button
+                onClick={() => load(true)}
+                className="mt-3 text-xs text-primary font-medium pressable"
+              >
+                Tentar novamente
+              </button>
             </div>
           )}
         </div>
