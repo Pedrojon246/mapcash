@@ -1,6 +1,6 @@
 export type TransactionType = 'income' | 'expense'
 export type Category =
-  | 'food' | 'transport' | 'housing' | 'health'
+  | 'food_home' | 'food_out' | 'transport' | 'housing' | 'health'
   | 'education' | 'entertainment' | 'shopping'
   | 'travel' | 'salary' | 'freelance' | 'investment' | 'other'
 
