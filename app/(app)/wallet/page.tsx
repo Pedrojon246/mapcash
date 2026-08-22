@@ -7,11 +7,12 @@ import { TransactionList } from '@/components/wallet/transaction-list'
 import { BalanceCard } from '@/components/wallet/balance-card'
 import { Greeting } from '@/components/wallet/greeting'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Settings } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useI18n } from '@/lib/i18n/context'
 import type { Transaction } from '@/lib/supabase/types'
 import { currentMonth } from '@/lib/utils'
+import Link from 'next/link'
 
 export default function WalletPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -50,23 +51,26 @@ export default function WalletPage() {
 
   return (
     <div className="animate-fade-in safe-top">
-      <PageHeader title={t.wallet} large />
+      <PageHeader
+        title={t.wallet}
+        large
+        right={
+          <Link href="/settings">
+            <button className="p-2 rounded-xl bg-secondary text-muted-foreground hover:text-foreground pressable">
+              <Settings className="w-5 h-5" />
+            </button>
+          </Link>
+        }
+      />
 
       <div className="space-y-3">
-        {/* Smart greeting */}
         <Greeting />
-
         <div className="px-5 space-y-3">
-          {/* Balance card */}
           <BalanceCard balance={balance} income={income} expenses={expenses} />
-
-          {/* Add button */}
           <Button onClick={handleAdd} className="w-full" size="lg">
             <Plus className="w-5 h-5 mr-2" />
             {t.addTransaction}
           </Button>
-
-          {/* Transactions */}
           <TransactionList
             transactions={transactions}
             loading={loading}
