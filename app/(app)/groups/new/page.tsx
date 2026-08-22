@@ -13,12 +13,6 @@ import { Loader2 } from 'lucide-react'
 
 const EMOJIS = ['✈️', '🏖️', '🏕️', '🎉', '🍕', '🎮', '🏠', '🎵', '🌍', '💼', '🎓', '❤️']
 
-function generateToken() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('')
-}
-
 export default function NewGroupPage() {
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('✈️')
@@ -36,28 +30,28 @@ export default function NewGroupPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Não autenticado')
 
-      const token = generateToken()
+      // Generate IDs client-side to avoid RLS select after insert
+      const groupId = crypto.randomUUID()
+      const token = crypto.randomUUID().replace(/-/g, '')
 
-      // Insert group
-      const { data: group, error: groupError } = await supabase
+      // Insert group WITHOUT .select() — avoids RLS block
+      const { error: groupError } = await supabase
         .from('groups')
         .insert({
+          id: groupId,
           name: name.trim(),
           emoji,
           created_by: user.id,
           invite_token: token,
         })
-        .select('id')
-        .single()
 
       if (groupError) throw groupError
-      if (!group) throw new Error('Grupo não criado')
 
       // Add creator as admin member
       const { error: memberError } = await supabase
         .from('group_members')
         .insert({
-          group_id: group.id,
+          group_id: groupId,
           user_id: user.id,
           role: 'admin',
         })
@@ -65,7 +59,7 @@ export default function NewGroupPage() {
       if (memberError) throw memberError
 
       toast({ variant: 'success', title: 'Grupo criado! 🎉' })
-      router.push(`/groups/${group.id}`)
+      router.push(`/groups/${groupId}`)
 
     } catch (err: any) {
       console.error('Group creation error:', err)
@@ -117,7 +111,7 @@ export default function NewGroupPage() {
             </div>
           </div>
 
-          {/* Name input */}
+          {/* Name */}
           <div className="space-y-2">
             <Label>{t.groupName}</Label>
             <Input

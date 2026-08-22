@@ -4,11 +4,10 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
-import { CATEGORY_EMOJIS } from '@/lib/utils'
+import { CATEGORY_EMOJIS, CATEGORY_COLORS, cn } from '@/lib/utils'
 import type { Transaction, Category } from '@/lib/supabase/types'
 import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
@@ -19,7 +18,14 @@ interface TransactionFormProps {
   onCancel: () => void
 }
 
-const CATEGORIES: Category[] = ['food','transport','housing','health','education','entertainment','shopping','travel','salary','freelance','investment','other']
+const EXPENSE_CATEGORIES: Category[] = [
+  'food_home', 'food_out', 'transport', 'housing',
+  'health', 'education', 'entertainment', 'shopping', 'travel', 'other'
+]
+
+const INCOME_CATEGORIES: Category[] = [
+  'salary', 'freelance', 'investment', 'other'
+]
 
 export function TransactionForm({ transaction, onSaved, onCancel }: TransactionFormProps) {
   const { t } = useI18n()
@@ -29,9 +35,22 @@ export function TransactionForm({ transaction, onSaved, onCancel }: TransactionF
   const [type, setType] = useState<'income' | 'expense'>(transaction?.type || 'expense')
   const [amount, setAmount] = useState<number | null>(transaction?.amount || null)
   const [description, setDescription] = useState(transaction?.description || '')
-  const [category, setCategory] = useState<Category>(transaction?.category || 'other')
+  const [category, setCategory] = useState<Category>(transaction?.category || 'food_home')
   const [date, setDate] = useState(transaction?.date || format(new Date(), 'yyyy-MM-dd'))
   const [loading, setLoading] = useState(false)
+
+  const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+
+  // Reset category when type changes if current category doesn't fit
+  function handleTypeChange(newType: 'income' | 'expense') {
+    setType(newType)
+    if (newType === 'income' && !INCOME_CATEGORIES.includes(category)) {
+      setCategory('salary')
+    }
+    if (newType === 'expense' && !EXPENSE_CATEGORIES.includes(category)) {
+      setCategory('food_home')
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -68,7 +87,7 @@ export function TransactionForm({ transaction, onSaved, onCancel }: TransactionF
           <button
             key={tp}
             type="button"
-            onClick={() => setType(tp)}
+            onClick={() => handleTypeChange(tp)}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
               type === tp
                 ? tp === 'expense'
@@ -92,28 +111,36 @@ export function TransactionForm({ transaction, onSaved, onCancel }: TransactionF
       <div className="space-y-2">
         <Label>{t.description}</Label>
         <Input
-          placeholder={type === 'expense' ? 'Ex: Supermercado, Uber...' : 'Ex: Salário, Freela...'}
+          placeholder={type === 'expense' ? 'Ex: Mercado, Uber, Aluguel...' : 'Ex: Salário, Freela...'}
           value={description}
           onChange={e => setDescription(e.target.value)}
           required
         />
       </div>
 
-      {/* Category */}
+      {/* Category — grid visual */}
       <div className="space-y-2">
         <Label>{t.category}</Label>
-        <Select value={category} onValueChange={v => setCategory(v as Category)}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map(c => (
-              <SelectItem key={c} value={c}>
-                {CATEGORY_EMOJIS[c]} {t.categories[c as keyof typeof t.categories]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto pr-1">
+          {categories.map(c => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={cn(
+                'flex flex-col items-center gap-1 p-2.5 rounded-xl border text-xs font-medium transition-all pressable',
+                category === c
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border bg-secondary text-muted-foreground hover:border-primary/50'
+              )}
+            >
+              <span className="text-xl">{CATEGORY_EMOJIS[c]}</span>
+              <span className="text-center leading-tight" style={{ fontSize: '10px' }}>
+                {t.categories[c as keyof typeof t.categories]}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Date */}
