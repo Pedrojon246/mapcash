@@ -2,10 +2,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/layout/page-header'
-import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { TransactionForm } from '@/components/wallet/transaction-form'
 import { TransactionList } from '@/components/wallet/transaction-list'
 import { BalanceCard } from '@/components/wallet/balance-card'
+import { Greeting } from '@/components/wallet/greeting'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -50,36 +50,32 @@ export default function WalletPage() {
 
   return (
     <div className="animate-fade-in safe-top">
-      <PageHeader
-        title={t.wallet}
-        large
-        right={
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-          </div>
-        }
-      />
+      <PageHeader title={t.wallet} large />
 
-      <div className="px-5 space-y-4">
-        {/* Balance card */}
-        <BalanceCard balance={balance} income={income} expenses={expenses} />
+      <div className="space-y-3">
+        {/* Smart greeting */}
+        <Greeting />
 
-        {/* Add button */}
-        <Button onClick={handleAdd} className="w-full" size="lg">
-          <Plus className="w-5 h-5 mr-2" />
-          {t.addTransaction}
-        </Button>
+        <div className="px-5 space-y-3">
+          {/* Balance card */}
+          <BalanceCard balance={balance} income={income} expenses={expenses} />
 
-        {/* Transactions */}
-        <TransactionList
-          transactions={transactions}
-          loading={loading}
-          onEdit={handleEdit}
-          onDeleted={load}
-        />
+          {/* Add button */}
+          <Button onClick={handleAdd} className="w-full" size="lg">
+            <Plus className="w-5 h-5 mr-2" />
+            {t.addTransaction}
+          </Button>
+
+          {/* Transactions */}
+          <TransactionList
+            transactions={transactions}
+            loading={loading}
+            onEdit={handleEdit}
+            onDeleted={load}
+          />
+        </div>
       </div>
 
-      {/* Form dialog */}
       <Dialog open={showForm} onOpenChange={open => !open && handleClose()}>
         <DialogContent>
           <TransactionForm

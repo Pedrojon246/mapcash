@@ -12,20 +12,42 @@ import { CurrencyInput } from '@/components/ui/currency-input'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
-import type { Group, GroupMember, GroupExpense } from '@/lib/supabase/types'
 import { Plus, Copy, Check, Users, Receipt, Scale, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 
+interface Member {
+  id: string
+  group_id: string
+  user_id: string | null
+  guest_name: string | null
+  role: string
+  display_name: string
+}
+
+interface Expense {
+  id: string
+  group_id: string
+  paid_by_user_id: string | null
+  paid_by_guest_name: string | null
+  description: string
+  amount: number
+  date: string
+  splits: { user_id: string | null; guest_name: string | null; amount: number; settled: boolean }[]
+}
+
 interface Balance {
+  key: string
   name: string
   userId: string | null
   net: number
 }
 
 export default function GroupDetailPage({ params }: { params: { groupId: string } }) {
-  const [group, setGroup] = useState<Group | null>(null)
-  const [members, setMembers] = useState<(GroupMember & { profile?: { name: string } })[]>([])
-  const [expenses, setExpenses] = useState<(GroupExpense & { splits?: any[] })[]>([])
+  const [groupName, setGroupName] = useState('')
+  const [groupEmoji, setGroupEmoji] = useState('👥')
+  const [inviteToken, setInviteToken] = useState('')
+  const [members, setMembers] = useState<Member[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [balances, setBalances] = useState<Balance[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -34,8 +56,10 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
   const [saving, setSaving] = useState(false)
 
   const [expForm, setExpForm] = useState({
-    description: '', amount: null as number | null,
-    paidBy: '', date: format(new Date(), 'yyyy-MM-dd'),
+    description: '',
+    amount: null as number | null,
+    paidBy: '',
+    date: format(new Date(), 'yyyy-MM-dd'),
   })
 
   const supabase = createClient()
@@ -47,28 +71,67 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
     if (!user) return
     setCurrentUserId(user.id)
 
-    const [{ data: grp }, { data: mems }, { data: exps }] = await Promise.all([
-      supabase.from('groups').select('*').eq('id', groupId).single(),
-      supabase.from('group_members').select('*, profile:profiles(name)').eq('group_id', groupId),
-      supabase.from('group_expenses').select('*, splits:group_expense_splits(*)').eq('group_id', groupId).order('date', { ascending: false }),
-    ])
+    // Load group info
+    const { data: grp } = await supabase
+      .from('groups')
+      .select('name, emoji, invite_token')
+      .eq('id', groupId)
+      .single()
 
-    setGroup(grp)
-    setMembers(mems || [])
-    setExpenses(exps || [])
-    if (mems?.length) setExpForm(f => ({ ...f, paidBy: user.id }))
+    if (grp) {
+      setGroupName(grp.name)
+      setGroupEmoji(grp.emoji)
+      setInviteToken(grp.invite_token)
+    }
+
+    // Load members
+    const { data: memberRows } = await supabase
+      .from('group_members')
+      .select('id, group_id, user_id, guest_name, role')
+      .eq('group_id', groupId)
+
+    // Resolve names for user members
+    const resolvedMembers: Member[] = []
+    for (const m of (memberRows || [])) {
+      let displayName = m.guest_name || 'Convidado'
+      if (m.user_id) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('name')
+          .eq('user_id', m.user_id)
+          .single()
+        displayName = profile?.name || m.user_id.slice(0, 8)
+      }
+      resolvedMembers.push({ ...m, display_name: displayName })
+    }
+    setMembers(resolvedMembers)
+
+    // Set default paidBy
+    const currentMember = resolvedMembers.find(m => m.user_id === user.id)
+    if (currentMember) {
+      setExpForm(f => ({ ...f, paidBy: currentMember.id }))
+    }
+
+    // Load expenses with splits
+    const { data: expRows } = await supabase
+      .from('group_expenses')
+      .select('*, splits:group_expense_splits(*)')
+      .eq('group_id', groupId)
+      .order('date', { ascending: false })
+
+    setExpenses(expRows || [])
 
     // Calculate balances
-    const bal: Record<string, { name: string; userId: string | null; net: number }> = {}
-    ;(mems || []).forEach((m: any) => {
-      const key = m.user_id || m.guest_name || ''
-      const name = m.profile?.name || m.guest_name || 'Convidado'
-      bal[key] = { name, userId: m.user_id, net: 0 }
+    const bal: Record<string, Balance> = {}
+    resolvedMembers.forEach(m => {
+      const key = m.user_id || m.guest_name || m.id
+      bal[key] = { key, name: m.display_name, userId: m.user_id, net: 0 }
     })
 
-    ;(exps || []).forEach((exp: any) => {
+    ;(expRows || []).forEach((exp: any) => {
       const paidKey = exp.paid_by_user_id || exp.paid_by_guest_name || ''
       if (bal[paidKey]) bal[paidKey].net += exp.amount
+
       ;(exp.splits || []).forEach((split: any) => {
         const splitKey = split.user_id || split.guest_name || ''
         if (bal[splitKey]) bal[splitKey].net -= split.amount
@@ -82,8 +145,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
   useEffect(() => { load() }, [load])
 
   async function copyInviteLink() {
-    if (!group) return
-    const url = `${window.location.origin}/join/${group.invite_token}`
+    const url = `${window.location.origin}/join/${inviteToken}`
     await navigator.clipboard.writeText(url)
     setCopied(true)
     toast({ variant: 'success', title: t.linkCopied })
@@ -95,20 +157,23 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
     if (!expForm.amount || !expForm.description || !expForm.paidBy) return
     setSaving(true)
 
+    const paidByMember = members.find(m => m.id === expForm.paidBy)
+    if (!paidByMember) { setSaving(false); return }
+
     const perPerson = expForm.amount / members.length
-    const paidByMember = members.find(m => m.user_id === expForm.paidBy || m.guest_name === expForm.paidBy)
 
     const { data: expense, error } = await supabase
       .from('group_expenses')
       .insert({
         group_id: groupId,
-        paid_by_user_id: paidByMember?.user_id || null,
-        paid_by_guest_name: paidByMember?.guest_name || null,
+        paid_by_user_id: paidByMember.user_id || null,
+        paid_by_guest_name: paidByMember.guest_name || null,
         description: expForm.description,
         amount: expForm.amount,
         date: expForm.date,
       })
-      .select().single()
+      .select()
+      .single()
 
     if (error || !expense) {
       toast({ variant: 'destructive', title: t.error })
@@ -116,7 +181,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
       return
     }
 
-    // Create splits for all members
+    // Create splits
     const splits = members.map(m => ({
       expense_id: expense.id,
       user_id: m.user_id || null,
@@ -128,39 +193,40 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
 
     toast({ variant: 'success', title: 'Gasto adicionado!' })
     setShowExpense(false)
-    setExpForm({ description: '', amount: null, paidBy: currentUserId || '', date: format(new Date(), 'yyyy-MM-dd') })
+    setExpForm(f => ({ ...f, description: '', amount: null }))
     load()
     setSaving(false)
   }
 
-  const getMemberName = (exp: GroupExpense) => {
+  const getPaidByName = (exp: Expense) => {
     if (exp.paid_by_user_id) {
-      const m = members.find(m => m.user_id === exp.paid_by_user_id) as any
-      return m?.profile?.name || 'Usuário'
+      return members.find(m => m.user_id === exp.paid_by_user_id)?.display_name || 'Alguém'
     }
-    return exp.paid_by_guest_name || 'Convidado'
+    return members.find(m => m.guest_name === exp.paid_by_guest_name)?.display_name || exp.paid_by_guest_name || 'Alguém'
   }
 
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0)
 
   if (loading) return (
-    <div className="safe-top px-5">
-      <div className="h-8 w-40 rounded-xl skeleton mt-4 mb-6" />
-      <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 rounded-2xl skeleton" />)}</div>
+    <div className="safe-top px-5 space-y-3 pt-4">
+      <div className="h-8 w-48 rounded-xl skeleton" />
+      <div className="h-24 rounded-2xl skeleton" />
+      <div className="h-20 rounded-2xl skeleton" />
+      <div className="h-20 rounded-2xl skeleton" />
     </div>
   )
-
-  if (!group) return null
 
   return (
     <div className="animate-fade-in safe-top">
       <PageHeader
-        title={`${group.emoji} ${group.name}`}
+        title={`${groupEmoji} ${groupName}`}
         back
         right={
           <Button size="sm" variant="outline" onClick={copyInviteLink}>
-            {copied ? <Check className="w-4 h-4 mr-1.5 text-[#34C759]" /> : <Copy className="w-4 h-4 mr-1.5" />}
-            {copied ? t.linkCopied : t.copyLink}
+            {copied
+              ? <><Check className="w-4 h-4 mr-1.5 text-[#34C759]" />{t.linkCopied}</>
+              : <><Copy className="w-4 h-4 mr-1.5" />{t.copyLink}</>
+            }
           </Button>
         }
       />
@@ -168,28 +234,30 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
       <div className="px-5">
         <Tabs defaultValue="expenses">
           <TabsList className="w-full mb-4">
-            <TabsTrigger value="expenses" className="flex-1">
-              <Receipt className="w-4 h-4 mr-1.5" />{t.groupExpenses}
+            <TabsTrigger value="expenses" className="flex-1 text-xs">
+              <Receipt className="w-3.5 h-3.5 mr-1" />Gastos
             </TabsTrigger>
-            <TabsTrigger value="balances" className="flex-1">
-              <Scale className="w-4 h-4 mr-1.5" />{t.balances}
+            <TabsTrigger value="balances" className="flex-1 text-xs">
+              <Scale className="w-3.5 h-3.5 mr-1" />Saldos
             </TabsTrigger>
-            <TabsTrigger value="members" className="flex-1">
-              <Users className="w-4 h-4 mr-1.5" />{t.members}
+            <TabsTrigger value="members" className="flex-1 text-xs">
+              <Users className="w-3.5 h-3.5 mr-1" />Membros
             </TabsTrigger>
           </TabsList>
 
           {/* EXPENSES */}
           <TabsContent value="expenses">
-            <div className="mb-4 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
-              <p className="text-sm text-muted-foreground">{t.totalExpenses}</p>
+            <div className="mb-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
+              <p className="text-xs text-muted-foreground">{t.totalExpenses}</p>
               <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
               {members.length > 0 && (
-                <p className="text-sm text-muted-foreground">{formatCurrency(totalExpenses / members.length)} {t.perPerson}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatCurrency(totalExpenses / members.length)} {t.perPerson}
+                </p>
               )}
             </div>
 
-            <Button className="w-full mb-4" onClick={() => setShowExpense(true)}>
+            <Button className="w-full mb-3" onClick={() => setShowExpense(true)}>
               <Plus className="w-5 h-5 mr-2" />{t.addExpense}
             </Button>
 
@@ -206,12 +274,16 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[15px] truncate">{exp.description}</p>
                   <p className="text-xs text-muted-foreground">
-                    {t.paidBy} {getMemberName(exp)} · {formatDate(exp.date)}
+                    {t.paidBy} {getPaidByName(exp)} · {formatDate(exp.date)}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="font-semibold">{formatCurrency(exp.amount)}</p>
-                  <p className="text-xs text-muted-foreground">{formatCurrency(exp.amount / members.length)} cada</p>
+                  {members.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(exp.amount / members.length)} cada
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -226,30 +298,44 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-semibold text-sm">
                       {b.name[0]?.toUpperCase()}
                     </div>
-                    <p className="font-medium">{b.name} {b.userId === currentUserId ? '(você)' : ''}</p>
+                    <div>
+                      <p className="font-medium text-[15px]">{b.name}</p>
+                      {b.userId === currentUserId && (
+                        <p className="text-xs text-muted-foreground">você</p>
+                      )}
+                    </div>
                   </div>
-                  <div className={cn('font-semibold', b.net > 0 ? 'text-[#34C759]' : b.net < 0 ? 'text-[#FF3B30]' : 'text-muted-foreground')}>
-                    {b.net > 0 ? '+' : ''}{formatCurrency(b.net)}
-                  </div>
+                  <p className={cn(
+                    'font-semibold text-[15px]',
+                    b.net > 0.01 ? 'text-[#34C759]' :
+                    b.net < -0.01 ? 'text-[#FF3B30]' :
+                    'text-muted-foreground'
+                  )}>
+                    {b.net > 0.01 ? '+' : ''}{formatCurrency(b.net)}
+                  </p>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-4">
-              Verde = a receber · Vermelho = a pagar
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              🟢 a receber · 🔴 a pagar
             </p>
           </TabsContent>
 
           {/* MEMBERS */}
           <TabsContent value="members">
             <div className="space-y-2">
-              {members.map((m: any, i) => (
+              {members.map((m, i) => (
                 <div key={i} className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary">
-                    {(m.profile?.name || m.guest_name || 'C')[0].toUpperCase()}
+                    {m.display_name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium">{m.profile?.name || m.guest_name || 'Convidado'}</p>
-                    <p className="text-xs text-muted-foreground">{m.role === 'admin' ? 'Admin' : 'Membro'} {m.user_id === currentUserId ? '· você' : ''}</p>
+                    <p className="font-medium text-[15px]">{m.display_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {m.role === 'admin' ? 'Admin' : 'Membro'}
+                      {!m.user_id && ' · convidado'}
+                      {m.user_id === currentUserId && ' · você'}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -263,39 +349,69 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
         <DialogContent>
           <form onSubmit={addExpense} className="space-y-4">
             <h2 className="text-[17px] font-semibold">{t.addExpense}</h2>
+
             <div className="space-y-2">
               <Label>{t.description}</Label>
-              <Input placeholder="Ex: Jantar, Airbnb, Gasolina..." value={expForm.description} onChange={e => setExpForm(f => ({...f, description: e.target.value}))} required autoFocus />
+              <Input
+                placeholder="Ex: Jantar, Airbnb, Gasolina..."
+                value={expForm.description}
+                onChange={e => setExpForm(f => ({ ...f, description: e.target.value }))}
+                required
+                autoFocus
+              />
             </div>
+
             <div className="space-y-2">
               <Label>{t.amount}</Label>
-              <CurrencyInput value={expForm.amount} onChange={v => setExpForm(f => ({...f, amount: v}))} size="large" />
+              <CurrencyInput
+                value={expForm.amount}
+                onChange={v => setExpForm(f => ({ ...f, amount: v }))}
+                size="large"
+              />
             </div>
+
             <div className="space-y-2">
               <Label>{t.paidBy}</Label>
-              <Select value={expForm.paidBy} onValueChange={v => setExpForm(f => ({...f, paidBy: v}))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select value={expForm.paidBy} onValueChange={v => setExpForm(f => ({ ...f, paidBy: v }))}>
+                <SelectTrigger><SelectValue placeholder="Quem pagou?" /></SelectTrigger>
                 <SelectContent>
-                  {members.map((m: any, i) => (
-                    <SelectItem key={i} value={m.user_id || m.guest_name || ''}>
-                      {m.profile?.name || m.guest_name || 'Convidado'}
+                  {members.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.display_name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label>{t.date}</Label>
-              <Input type="date" value={expForm.date} onChange={e => setExpForm(f => ({...f, date: e.target.value}))} />
+              <Input
+                type="date"
+                value={expForm.date}
+                onChange={e => setExpForm(f => ({ ...f, date: e.target.value }))}
+              />
             </div>
+
             {expForm.amount && members.length > 0 && (
               <div className="p-3 bg-secondary rounded-xl text-sm text-center text-muted-foreground">
-                {t.splitEqually}: <strong className="text-foreground">{formatCurrency(expForm.amount / members.length)}</strong> por pessoa
+                Dividindo igualmente:{' '}
+                <strong className="text-foreground">
+                  {formatCurrency(expForm.amount / members.length)}
+                </strong>{' '}
+                por pessoa ({members.length} pessoas)
               </div>
             )}
+
             <div className="flex gap-2">
-              <Button type="button" variant="secondary" onClick={() => setShowExpense(false)} className="flex-1">{t.cancel}</Button>
-              <Button type="submit" disabled={saving || !expForm.amount || !expForm.description} className="flex-1">
+              <Button type="button" variant="secondary" onClick={() => setShowExpense(false)} className="flex-1">
+                {t.cancel}
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving || !expForm.amount || !expForm.description || !expForm.paidBy}
+                className="flex-1"
+              >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t.save}
               </Button>
             </div>

@@ -1,10 +1,8 @@
 export const translations = {
   pt: {
-    // App
     appName: 'Map Cash',
     appTagline: 'Seu dinheiro, mapeado.',
 
-    // Nav
     wallet: 'Carteira',
     budget: 'Orçamento',
     goals: 'Metas',
@@ -12,7 +10,6 @@ export const translations = {
     reports: 'Relatórios',
     settings: 'Ajustes',
 
-    // Auth
     login: 'Entrar',
     register: 'Criar conta',
     logout: 'Sair',
@@ -26,7 +23,6 @@ export const translations = {
     welcomeBack: 'Bem-vindo de volta',
     createAccount: 'Criar sua conta',
 
-    // Wallet
     balance: 'Saldo',
     income: 'Receita',
     expenses: 'Despesas',
@@ -37,7 +33,6 @@ export const translations = {
     thisMonth: 'Este mês',
     allTime: 'Todo período',
 
-    // Transaction
     description: 'Descrição',
     amount: 'Valor',
     category: 'Categoria',
@@ -52,9 +47,9 @@ export const translations = {
     confirmDelete: 'Confirmar exclusão',
     confirmDeleteDesc: 'Essa ação não pode ser desfeita.',
 
-    // Categories
     categories: {
-      food: 'Alimentação',
+      food_home: 'Mercado / Casa',
+      food_out: 'Lanche / Restaurante',
       transport: 'Transporte',
       housing: 'Moradia',
       health: 'Saúde',
@@ -68,7 +63,6 @@ export const translations = {
       other: 'Outros',
     },
 
-    // Budget
     budgetTitle: 'Orçamento mensal',
     setBudget: 'Definir limite',
     budgetFor: 'Limite para',
@@ -82,7 +76,6 @@ export const translations = {
     overBudget: 'Limite ultrapassado',
     nearLimit: 'Próximo do limite',
 
-    // Goals
     goalsTitle: 'Minhas metas',
     addGoal: 'Nova meta',
     editGoal: 'Editar meta',
@@ -97,7 +90,6 @@ export const translations = {
     monthsLeft: 'meses restantes',
     suggestedMonthly: 'Sugestão mensal',
 
-    // Groups
     groupsTitle: 'Grupos',
     createGroup: 'Criar grupo',
     groupName: 'Nome do grupo',
@@ -125,14 +117,12 @@ export const translations = {
     totalExpenses: 'Total de gastos',
     perPerson: 'por pessoa',
 
-    // Reports
     reportsTitle: 'Relatórios',
     byCategory: 'Por categoria',
     monthly: 'Mensal',
     noData: 'Sem dados para exibir',
     noDataDesc: 'Adicione lançamentos para ver seus relatórios.',
 
-    // Common
     loading: 'Carregando...',
     error: 'Algo deu errado',
     retry: 'Tentar novamente',
@@ -151,7 +141,6 @@ export const translations = {
     appName: 'Map Cash',
     appTagline: 'Your money, mapped.',
 
-    nav: 'nav',
     wallet: 'Wallet',
     budget: 'Budget',
     goals: 'Goals',
@@ -197,7 +186,8 @@ export const translations = {
     confirmDeleteDesc: 'This action cannot be undone.',
 
     categories: {
-      food: 'Food',
+      food_home: 'Groceries / Home',
+      food_out: 'Snacks / Restaurant',
       transport: 'Transport',
       housing: 'Housing',
       health: 'Health',

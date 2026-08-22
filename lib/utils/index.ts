@@ -38,22 +38,24 @@ export function generateInviteToken(): string {
 }
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  food: '#FF9500',
+  food_home: '#34C759',
+  food_out: '#FF9500',
   transport: '#007AFF',
   housing: '#5856D6',
   health: '#FF2D55',
-  education: '#34C759',
+  education: '#30B0C7',
   entertainment: '#AF52DE',
-  shopping: '#FF3B30',
+  shopping: '#FF6B35',
   travel: '#5AC8FA',
   salary: '#34C759',
-  freelance: '#30B0C7',
-  investment: '#007AFF',
+  freelance: '#007AFF',
+  investment: '#5856D6',
   other: '#8E8E93',
 }
 
 export const CATEGORY_EMOJIS: Record<string, string> = {
-  food: '🍽️',
+  food_home: '🛒',
+  food_out: '🍔',
   transport: '🚗',
   housing: '🏠',
   health: '💊',
@@ -66,6 +68,12 @@ export const CATEGORY_EMOJIS: Record<string, string> = {
   investment: '📈',
   other: '📦',
 }
+
+// Categories that are considered "cuttable" (non-essential)
+export const CUTTABLE_CATEGORIES = ['food_out', 'entertainment', 'shopping', 'travel']
+
+// Categories that are essential
+export const ESSENTIAL_CATEGORIES = ['food_home', 'transport', 'housing', 'health', 'education']
 
 export const GOAL_COLORS = [
   '#007AFF', '#34C759', '#FF9500', '#FF3B30',
