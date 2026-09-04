@@ -28,13 +28,13 @@ export function useTutorial(screen: TutorialScreen) {
   }
 
   function skipAll() {
-    const all: TutorialScreen[] = ['wallet','budget','goals','investments','groups','reports']
-    const seen = getSeen()
-    const newSeen = [...new Set([...seen, ...all])]
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSeen))
-    setVisible(false)
-    setReady(true)
-  }
+  const all: TutorialScreen[] = ['wallet','budget','goals','investments','groups','reports']
+  const seen = getSeen()
+  const merged = seen.concat(all.filter(s => !seen.includes(s)))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(merged))
+  setVisible(false)
+  setReady(true)
+}
 
   return { visible, dismiss, skipAll, ready }
 }
