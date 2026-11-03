@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'Map Cash — Pra onde foi o seu dinheiro?',
-  description: 'Controle financeiro simples, direto do celular. Lance gastos em segundos, receba aviso antes de estourar o limite e comece com 1 mês grátis.',
+  description: 'Controle financeiro simples, direto do celular. Lance gastos em segundos, receba aviso antes de estourar o limite e comece grátis.',
 }
 
 function CreateButton({ className = '' }: { className?: string }) {
@@ -17,7 +17,7 @@ function CreateButton({ className = '' }: { className?: string }) {
     >
       <span>
         <span className="block text-[17px] font-semibold tracking-tight">Criar minha conta</span>
-        <span className="block text-[13px] opacity-70 mt-0.5">1º mês grátis · depois R$ 15/mês</span>
+        <span className="block text-[13px] opacity-70 mt-0.5">Grátis por enquanto</span>
       </span>
       <span className="w-9 h-9 rounded-full bg-primary-foreground text-primary flex items-center justify-center flex-shrink-0">
         <ArrowRight className="w-[18px] h-[18px]" strokeWidth={2} />
@@ -123,11 +123,13 @@ export default async function Home() {
         </section>
 
         <section className="mt-12 md:mt-20 border-t border-border pt-8 text-center">
-          <p className="text-[13px] text-income">1º mês grátis</p>
-          <p className="mt-1.5 font-bold tracking-[-2.4px] leading-none" style={{ fontSize: 52 }}>
-            R$ 15<span className="text-[18px] tracking-tight font-normal text-muted-foreground"> /mês</span>
+          <p className="text-[13px] text-income">Acesso antecipado</p>
+          <p className="mt-1.5 font-bold tracking-[-2px] leading-none" style={{ fontSize: 44 }}>
+            Grátis por enquanto
           </p>
-          <p className="text-[14px] text-muted-foreground mt-2.5">Tudo incluso. Cancele quando quiser.</p>
+          <p className="text-[14px] text-muted-foreground mt-3 max-w-xs mx-auto">
+            Estamos em fase de testes. Use à vontade e nos conte o que melhorar.
+          </p>
 
           <div className="mt-6 max-w-md mx-auto">
             <CreateButton className="text-left" />
