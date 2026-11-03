@@ -8,7 +8,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
-import { Loader2, MapPin } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { Logo } from '@/components/shared/logo'
+import { GoogleButton, OrDivider } from '@/components/auth/google-button'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -37,16 +39,15 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
         {/* Logo */}
         <div className="mb-10 text-center animate-fade-in">
-          <div className="w-20 h-20 rounded-[22px] bg-primary flex items-center justify-center mx-auto mb-4 shadow-apple-lg">
-            <MapPin className="w-10 h-10 text-white" strokeWidth={2} />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">{t.appName}</h1>
-          <p className="text-muted-foreground mt-1">{t.appTagline}</p>
+          <Logo className="mx-auto mb-5" />
+          <h1 className="text-[32px] font-bold tracking-[-0.8px]">{t.appName}</h1>
+          <p className="text-muted-foreground mt-1 text-[15px]">{t.appTagline}</p>
         </div>
 
         {/* Form */}
         <div className="w-full max-w-sm animate-slide-up">
-          <h2 className="text-2xl font-bold mb-6">{t.welcomeBack}</h2>
+          <GoogleButton />
+          <OrDivider />
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label>{t.email}</Label>
@@ -75,9 +76,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-[14px] text-muted-foreground mt-6">
             {t.noAccount}{' '}
-            <Link href="/register" className="text-primary font-semibold hover:underline">
+            <Link href="/register" className="text-foreground font-semibold underline underline-offset-4">
               {t.createFree}
             </Link>
           </p>

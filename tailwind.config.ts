@@ -21,6 +21,8 @@ module.exports = {
         muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
         accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
         destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
+        income: 'hsl(var(--income))',
+        warn: 'hsl(var(--warn))',
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -46,7 +48,7 @@ module.exports = {
       borderRadius: {
         lg: '12px',
         xl: '16px',
-        '2xl': '20px',
+        '2xl': '22px',
         '3xl': '28px',
       },
       boxShadow: {

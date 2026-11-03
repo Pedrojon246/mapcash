@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
-import { MapPin, Users, Loader2 } from 'lucide-react'
+import { Users, Loader2 } from 'lucide-react'
+import { Logo } from '@/components/shared/logo'
+import { GlyphIcon } from '@/components/ui/icons'
 import Link from 'next/link'
 import type { Group } from '@/lib/supabase/types'
 
@@ -62,7 +64,7 @@ export default function JoinPage({ params }: { params: { token: string } }) {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
     </div>
   )
 
@@ -81,19 +83,17 @@ export default function JoinPage({ params }: { params: { token: string } }) {
       <div className="w-full max-w-sm">
         {/* App logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-[12px] bg-primary flex items-center justify-center">
-            <MapPin className="w-6 h-6 text-white" strokeWidth={2} />
-          </div>
-          <span className="text-xl font-bold">{t.appName}</span>
+          <Logo size={40} />
+          <span className="text-xl font-bold tracking-tight">{t.appName}</span>
         </div>
 
         {/* Group info */}
         <div className="text-center mb-8 animate-scale-in">
-          <div className="w-20 h-20 rounded-3xl bg-[#AF52DE]/10 flex items-center justify-center text-4xl mx-auto mb-4">
-            {group.emoji}
+          <div className="w-20 h-20 rounded-[26px] bg-card flex items-center justify-center mx-auto mb-4">
+            <GlyphIcon glyph={group.emoji} className="w-9 h-9" strokeWidth={1.6} />
           </div>
           <p className="text-muted-foreground text-sm">{t.joinGroupDesc}</p>
-          <h1 className="text-2xl font-bold mt-1">{group.name}</h1>
+          <h1 className="text-[28px] font-bold tracking-tight mt-1">{group.name}</h1>
         </div>
 
         <div className="space-y-3 animate-slide-up">
@@ -116,7 +116,7 @@ export default function JoinPage({ params }: { params: { token: string } }) {
             <div className="relative flex justify-center text-xs"><span className="bg-background px-3 text-muted-foreground">ou</span></div>
           </div>
 
-          <div className="space-y-3 p-4 bg-secondary rounded-2xl">
+          <div className="space-y-3 p-4 bg-card rounded-[22px]">
             <Label>{t.guestName}</Label>
             <Input
               placeholder="Seu nome"
@@ -124,7 +124,7 @@ export default function JoinPage({ params }: { params: { token: string } }) {
               onChange={e => setGuestName(e.target.value)}
             />
             <Button
-              variant="outline"
+              variant="secondary"
               className="w-full"
               onClick={joinAsGuest}
               disabled={joining || !guestName.trim()}

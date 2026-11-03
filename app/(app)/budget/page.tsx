@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
-import { formatCurrency, CATEGORY_EMOJIS, CATEGORY_COLORS, currentMonth, cn } from '@/lib/utils'
+import { formatCurrency, currentMonth, monthRange, cn } from '@/lib/utils'
+import { CategoryIcon } from '@/components/ui/icons'
 import type { Budget, Category } from '@/lib/supabase/types'
-import { Plus, Pencil, Trash2, AlertCircle, BookOpen } from 'lucide-react'
+import { Plus, Pencil, Trash2, AlertTriangle, BookOpen, PieChart } from 'lucide-react'
 import { AutoTutorial } from '@/components/shared/auto-tutorial'
 import { TutorialsModal } from '@/components/shared/tutorial-overlay'
 import { useShowTutorial } from '@/lib/hooks/use-tutorial'
@@ -43,7 +44,7 @@ export default function BudgetPage() {
     const [{ data: budgetsData }, { data: txData }] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month),
       supabase.from('transactions').select('amount,category').eq('user_id', user.id)
-        .eq('type', 'expense').gte('date', month + '-01').lte('date', month + '-31'),
+        .eq('type', 'expense').gte('date', monthRange(month).start).lt('date', monthRange(month).end),
     ])
     setBudgets(budgetsData || [])
     const sp: Record<string, number> = {}
@@ -79,8 +80,6 @@ export default function BudgetPage() {
   }
 
   const getCatLabel = (cat: string) => t.categories[cat as keyof typeof t.categories] || cat
-  const getCatEmoji = (cat: string) => CATEGORY_EMOJIS[cat] || '📦'
-  const getCatColor = (cat: string) => CATEGORY_COLORS[cat] || '#8E8E93'
   const budgetedCats = new Set(budgets.map(b => b.category))
   const availableCats = EXPENSE_CATEGORIES.filter(c => !budgetedCats.has(c) || c === editBudget?.category)
 
@@ -92,11 +91,11 @@ export default function BudgetPage() {
         right={
           <div className="flex items-center gap-2">
             <button onClick={openTutModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
-              <BookOpen className="w-3.5 h-3.5" /> Tutoriais
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
+              <BookOpen className="w-3.5 h-3.5" strokeWidth={1.8} /> Tutoriais
             </button>
-            <Button size="icon" onClick={openAdd} className="w-9 h-9 rounded-full">
-              <Plus className="w-4 h-4" />
+            <Button size="icon" onClick={openAdd} className="w-9 h-9">
+              <Plus className="w-4 h-4" strokeWidth={2.2} />
             </Button>
           </div>
         }
@@ -104,13 +103,15 @@ export default function BudgetPage() {
 
       <div className="px-5 space-y-3">
         {loading ? (
-          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 rounded-[20px] skeleton" />)}</div>
+          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 rounded-[22px] skeleton" />)}</div>
         ) : budgets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4 text-3xl">📊</div>
+            <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4">
+              <PieChart className="w-7 h-7 text-muted-foreground" strokeWidth={1.6} />
+            </div>
             <p className="font-semibold text-[17px]">{t.noBudgets}</p>
             <p className="text-[14px] text-muted-foreground mt-1 max-w-[240px]">{t.noBudgetsDesc}</p>
-            <Button className="mt-5 h-11 px-6 rounded-full" onClick={openAdd}>
+            <Button className="mt-5" onClick={openAdd}>
               <Plus className="w-4 h-4 mr-2" />{t.addBudget}
             </Button>
           </div>
@@ -119,38 +120,34 @@ export default function BudgetPage() {
           const pct = Math.min((spent / b.monthly_limit) * 100, 100)
           const over = spent > b.monthly_limit
           const near = !over && pct >= 80
-          const color = over ? '#FF3B30' : near ? '#FF9500' : getCatColor(b.category)
+          const color = over ? 'hsl(var(--warn))' : near ? 'hsl(var(--warn))' : 'hsl(var(--foreground))'
           return (
-            <div key={b.id} className="p-5 bg-card rounded-[20px] border border-border/40"
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <div key={b.id} className="p-5 bg-card rounded-[22px]">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-[14px] flex items-center justify-center text-xl"
-                    style={{ background: getCatColor(b.category) + '18' }}>
-                    {getCatEmoji(b.category)}
-                  </div>
+                  <div className="icon-tile"><CategoryIcon category={b.category} /></div>
                   <div>
-                    <p className="font-semibold text-[16px]">{getCatLabel(b.category)}</p>
+                    <p className="font-semibold text-[16px] tracking-tight">{getCatLabel(b.category)}</p>
                     <p className="text-[13px] text-muted-foreground">
                       {formatCurrency(spent)} de {formatCurrency(b.monthly_limit)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  {over && <AlertCircle className="w-4 h-4 text-[#FF3B30] mr-1" />}
+                  {over && <AlertTriangle className="w-4 h-4 text-warn mr-1" strokeWidth={1.8} />}
                   <button onClick={() => openEdit(b)} className="p-2 rounded-full hover:bg-secondary pressable">
-                    <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Pencil className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.8} />
                   </button>
                   <button onClick={() => setDeleteId(b.id)} className="p-2 rounded-full hover:bg-destructive/10 pressable">
-                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                    <Trash2 className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.8} />
                   </button>
                 </div>
               </div>
-              <Progress value={pct} color={color} className="h-2.5" />
+              <Progress value={pct} color={color} />
               <div className="flex justify-between mt-2.5">
                 <span className={cn('text-[12px] font-medium',
-                  over ? 'text-[#FF3B30]' : near ? 'text-[#FF9500]' : 'text-muted-foreground')}>
-                  {over ? '⚠️ Limite ultrapassado' : near ? '⚡ Próximo do limite' : `${pct.toFixed(0)}%`}
+                  over || near ? 'text-warn' : 'text-muted-foreground')}>
+                  {over ? 'Limite ultrapassado' : near ? 'Próximo do limite' : `${pct.toFixed(0)}%`}
                 </span>
                 <span className="text-[12px] text-muted-foreground">
                   {formatCurrency(Math.max(b.monthly_limit - spent, 0))} restante
@@ -164,14 +161,14 @@ export default function BudgetPage() {
       <Dialog open={showForm} onOpenChange={open => !open && setShowForm(false)}>
         <DialogContent>
           <form onSubmit={handleSave} className="space-y-4">
-            <h2 className="text-[18px] font-bold">{editBudget ? t.editBudget : t.addBudget}</h2>
+            <h2 className="text-[20px] font-bold tracking-tight">{editBudget ? t.editBudget : t.addBudget}</h2>
             <div className="space-y-2">
               <Label>{t.category}</Label>
               <Select value={category} onValueChange={v => setCategory(v as Category)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {availableCats.map(c => (
-                    <SelectItem key={c} value={c}>{getCatEmoji(c)} {getCatLabel(c)}</SelectItem>
+                    <SelectItem key={c} value={c}>{getCatLabel(c)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -191,8 +188,8 @@ export default function BudgetPage() {
       <Dialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>
         <DialogContent>
           <div className="text-center py-2">
-            <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-              <Trash2 className="w-7 h-7 text-destructive" />
+            <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-foreground" strokeWidth={1.7} />
             </div>
             <h2 className="text-[17px] font-semibold mb-1">{t.confirmDelete}</h2>
             <p className="text-sm text-muted-foreground mb-6">{t.confirmDeleteDesc}</p>

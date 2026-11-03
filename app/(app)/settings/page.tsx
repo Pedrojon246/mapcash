@@ -8,7 +8,8 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useTheme } from 'next-themes'
-import { LogOut, Moon, Sun, Globe, ChevronRight, User } from 'lucide-react'
+import { LogOut, Moon, Sun, Globe, ChevronRight, Check } from 'lucide-react'
+import { InstallCard } from '@/components/shared/pwa'
 import type { Locale } from '@/lib/i18n/translations'
 
 export default function SettingsPage() {
@@ -30,81 +31,71 @@ export default function SettingsPage() {
     <div className="animate-fade-in safe-top">
       <PageHeader title="Ajustes" large />
 
-      <div className="px-5 space-y-4">
+      <div className="px-5 space-y-5">
+
+        <InstallCard />
 
         {/* Appearance */}
-        <div className="bg-card rounded-2xl shadow-apple-sm border border-border/50 overflow-hidden">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-2">
-            Aparência
-          </p>
-
-          <div className="flex items-center justify-between px-4 py-3.5 border-t border-border/30">
-            <div className="flex items-center gap-3">
-              {isDark ? <Moon className="w-5 h-5 text-primary" /> : <Sun className="w-5 h-5 text-primary" />}
-              <span className="text-[15px] font-medium">Tema escuro</span>
+        <div>
+          <p className="section-label px-1 mb-2">Aparência</p>
+          <div className="list-group">
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <div className="flex items-center gap-3.5">
+                <div className="icon-tile">{isDark ? <Moon className="w-5 h-5" strokeWidth={1.8} /> : <Sun className="w-5 h-5" strokeWidth={1.8} />}</div>
+                <span className="text-[16px] font-medium tracking-tight">Tema escuro</span>
+              </div>
+              <Switch checked={isDark} onCheckedChange={v => setTheme(v ? 'dark' : 'light')} />
             </div>
-            <Switch
-              checked={isDark}
-              onCheckedChange={v => setTheme(v ? 'dark' : 'light')}
-            />
           </div>
         </div>
 
         {/* Language */}
-        <div className="bg-card rounded-2xl shadow-apple-sm border border-border/50 overflow-hidden">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-2">
-            Idioma
-          </p>
-          {([
-            { code: 'pt', label: '🇧🇷 Português' },
-            { code: 'en', label: '🇺🇸 English' },
-          ] as { code: Locale; label: string }[]).map(lang => (
-            <button
-              key={lang.code}
-              onClick={() => setLocale(lang.code)}
-              className="w-full flex items-center justify-between px-4 py-3.5 border-t border-border/30 pressable hover:bg-accent"
-            >
-              <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-primary" />
-                <span className="text-[15px] font-medium">{lang.label}</span>
-              </div>
-              {locale === lang.code && (
-                <span className="text-primary text-sm font-semibold">✓</span>
-              )}
-            </button>
-          ))}
+        <div>
+          <p className="section-label px-1 mb-2">Idioma</p>
+          <div className="list-group">
+            {([
+              { code: 'pt', label: 'Português' },
+              { code: 'en', label: 'English' },
+            ] as { code: Locale; label: string }[]).map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => setLocale(lang.code)}
+                className="w-full flex items-center justify-between px-4 py-3.5 pressable"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="icon-tile"><Globe className="w-5 h-5" strokeWidth={1.8} /></div>
+                  <span className="text-[16px] font-medium tracking-tight">{lang.label}</span>
+                </div>
+                {locale === lang.code && <Check className="w-5 h-5 text-foreground" strokeWidth={2.2} />}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Account */}
-        <div className="bg-card rounded-2xl shadow-apple-sm border border-border/50 overflow-hidden">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-2">
-            Conta
-          </p>
-
-          <button
-            onClick={() => setShowLogout(true)}
-            className="w-full flex items-center justify-between px-4 py-3.5 border-t border-border/30 pressable hover:bg-accent text-destructive"
-          >
-            <div className="flex items-center gap-3">
-              <LogOut className="w-5 h-5" />
-              <span className="text-[15px] font-medium">Sair da conta</span>
-            </div>
-            <ChevronRight className="w-4 h-4 opacity-50" />
-          </button>
+        <div>
+          <p className="section-label px-1 mb-2">Conta</p>
+          <div className="list-group">
+            <button onClick={() => setShowLogout(true)} className="w-full flex items-center justify-between px-4 py-3.5 pressable">
+              <div className="flex items-center gap-3.5">
+                <div className="icon-tile"><LogOut className="w-5 h-5" strokeWidth={1.8} /></div>
+                <span className="text-[16px] font-medium tracking-tight">Sair da conta</span>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" strokeWidth={1.8} />
+            </button>
+          </div>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center pt-2">
-          Map Cash · versão 1.0
-        </p>
+        <p className="text-xs text-muted-foreground text-center pt-2">Map Cash · versão 1.1</p>
       </div>
 
       <Dialog open={showLogout} onOpenChange={setShowLogout}>
         <DialogContent>
           <div className="text-center py-2">
-            <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-              <LogOut className="w-7 h-7 text-destructive" />
+            <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
+              <LogOut className="w-6 h-6 text-foreground" strokeWidth={1.7} />
             </div>
-            <h2 className="text-[17px] font-semibold mb-1">Sair da conta?</h2>
+            <h2 className="text-[20px] font-bold tracking-tight mb-1">Sair da conta?</h2>
             <p className="text-sm text-muted-foreground mb-6">
               Você precisará entrar novamente para acessar o app.
             </p>

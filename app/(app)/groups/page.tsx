@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
+import { GlyphIcon } from '@/components/ui/icons'
 import { useI18n } from '@/lib/i18n/context'
 import { Plus, Users, ChevronRight, Bell, Check, X, BookOpen } from 'lucide-react'
 import Link from 'next/link'
@@ -83,7 +84,7 @@ export default function GroupsPage() {
     await supabase.from('group_invites')
       .update({ status: 'accepted', responded_at: new Date().toISOString() }).eq('id', invite.id)
     await supabase.from('group_members').insert({ group_id: invite.group_id, user_id: user.id, role: 'member' })
-    toast({ variant: 'success', title: `Você entrou em "${invite.group_name}"! 🎉` })
+    toast({ variant: 'success', title: `Você entrou em "${invite.group_name}"!` })
     load()
   }
 
@@ -102,11 +103,11 @@ export default function GroupsPage() {
         right={
           <div className="flex items-center gap-2">
             <button onClick={openTutModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
-              <BookOpen className="w-3.5 h-3.5" /> Tutoriais
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
+              <BookOpen className="w-3.5 h-3.5" strokeWidth={1.8} /> Tutoriais
             </button>
             <Link href="/groups/new">
-              <Button size="icon" className="w-9 h-9 rounded-full"><Plus className="w-4 h-4" /></Button>
+              <Button size="icon" className="w-9 h-9"><Plus className="w-4 h-4" strokeWidth={2.2} /></Button>
             </Link>
           </div>
         }
@@ -117,28 +118,25 @@ export default function GroupsPage() {
         {invites.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-1">
-              <Bell className="w-4 h-4 text-[#FF9500]" />
-              <p className="text-[13px] font-semibold text-[#FF9500]">
+              <Bell className="w-4 h-4 text-warn" strokeWidth={1.8} />
+              <p className="text-[13px] font-semibold text-warn">
                 {invites.length} convite{invites.length > 1 ? 's' : ''} pendente{invites.length > 1 ? 's' : ''}
               </p>
             </div>
             {invites.map(inv => (
-              <div key={inv.id} className="p-4 bg-card rounded-[20px] border border-[#FF9500]/30"
-                style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+              <div key={inv.id} className="p-4 bg-card rounded-[22px] ring-1 ring-warn/40">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-[12px] bg-[#AF52DE]/10 flex items-center justify-center text-xl">
-                    {inv.group_emoji}
-                  </div>
+                  <div className="icon-tile"><GlyphIcon glyph={inv.group_emoji} /></div>
                   <div>
                     <p className="font-semibold text-[15px]">{inv.group_name}</p>
                     <p className="text-[12px] text-muted-foreground">Convite pendente</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => handleDecline(inv)} className="flex-1 h-10 rounded-[12px]">
+                  <Button variant="secondary" size="sm" onClick={() => handleDecline(inv)} className="flex-1 h-10">
                     <X className="w-4 h-4 mr-1.5" /> Recusar
                   </Button>
-                  <Button size="sm" onClick={() => handleAccept(inv)} className="flex-1 h-10 rounded-[12px]">
+                  <Button size="sm" onClick={() => handleAccept(inv)} className="flex-1 h-10">
                     <Check className="w-4 h-4 mr-1.5" /> Aceitar
                   </Button>
                 </div>
@@ -149,34 +147,31 @@ export default function GroupsPage() {
 
         {/* Groups list */}
         {loading ? (
-          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 rounded-[20px] skeleton" />)}</div>
+          <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 rounded-[22px] skeleton" />)}</div>
         ) : groups.length === 0 && invites.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-muted-foreground" />
+            <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4">
+              <Users className="w-7 h-7 text-muted-foreground" strokeWidth={1.6} />
             </div>
             <p className="font-semibold text-[17px]">{t.noGroups}</p>
             <p className="text-[14px] text-muted-foreground mt-1 max-w-[240px]">{t.noGroupsDesc}</p>
             <Link href="/groups/new">
-              <Button className="mt-5 h-11 px-6 rounded-full">
+              <Button className="mt-5">
                 <Plus className="w-4 h-4 mr-2" />{t.createGroup}
               </Button>
             </Link>
           </div>
         ) : groups.map(g => (
           <Link key={g.id} href={`/groups/${g.id}`}>
-            <div className="flex items-center gap-4 p-4 bg-card rounded-[20px] border border-border/40 pressable"
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-              <div className="w-12 h-12 rounded-[14px] bg-[#AF52DE]/10 flex items-center justify-center text-2xl flex-shrink-0">
-                {g.emoji}
-              </div>
+            <div className="flex items-center gap-3.5 p-4 bg-card rounded-[22px] pressable">
+              <div className="icon-tile"><GlyphIcon glyph={g.emoji} /></div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[15px] truncate">{g.name}</p>
+                <p className="font-semibold text-[16px] tracking-tight truncate">{g.name}</p>
                 <p className="text-[12px] text-muted-foreground">
                   {g.memberCount} {g.memberCount === 1 ? 'membro' : 'membros'}
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" strokeWidth={1.8} />
             </div>
           </Link>
         ))}

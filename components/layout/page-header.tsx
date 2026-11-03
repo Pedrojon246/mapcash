@@ -15,24 +15,24 @@ interface PageHeaderProps {
 export function PageHeader({ title, subtitle, back, right, className, large }: PageHeaderProps) {
   const router = useRouter()
   return (
-    <div className={cn('flex items-center justify-between px-5 pt-4 pb-2', className)}>
+    <div className={cn('flex items-center justify-between px-5 pt-5 pb-3', className)}>
       <div className="flex items-center gap-2 min-w-0">
         {back && (
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-0.5 text-primary font-medium text-[15px] pressable mr-1 flex-shrink-0"
+            className="flex items-center justify-center w-9 h-9 rounded-full bg-secondary text-foreground pressable mr-2 flex-shrink-0"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
         <div className="min-w-0">
           <h1 className={cn(
-            'font-bold tracking-tight truncate',
-            large ? 'text-3xl' : 'text-xl'
+            'font-bold truncate',
+            large ? 'text-[32px] leading-tight tracking-[-0.8px]' : 'text-[22px] tracking-[-0.4px]'
           )}>
             {title}
           </h1>
-          {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-[13px] text-muted-foreground mt-0.5">{subtitle}</p>}
         </div>
       </div>
       {right && <div className="flex-shrink-0 ml-3">{right}</div>}

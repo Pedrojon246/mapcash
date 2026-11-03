@@ -6,6 +6,7 @@ import { TransactionForm } from '@/components/wallet/transaction-form'
 import { TransactionList } from '@/components/wallet/transaction-list'
 import { BalanceCard } from '@/components/wallet/balance-card'
 import { Greeting } from '@/components/wallet/greeting'
+import { InstallCard } from '@/components/shared/pwa'
 import { Button } from '@/components/ui/button'
 import { Plus, Settings, BookOpen } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
@@ -80,13 +81,13 @@ export default function WalletPage() {
         right={
           <div className="flex items-center gap-2">
             <button onClick={openTutModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
-              <BookOpen className="w-3.5 h-3.5" />
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable text-[12px] font-medium">
+              <BookOpen className="w-3.5 h-3.5" strokeWidth={1.8} />
               Tutoriais
             </button>
             <Link href="/settings">
-              <button className="p-2 rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable">
-                <Settings className="w-4 h-4" />
+              <button className="w-9 h-9 flex items-center justify-center rounded-full bg-secondary text-muted-foreground hover:text-foreground pressable">
+                <Settings className="w-4 h-4" strokeWidth={1.8} />
               </button>
             </Link>
           </div>
@@ -96,13 +97,10 @@ export default function WalletPage() {
       <div className="space-y-3">
         <Greeting />
         <div className="px-5 space-y-3">
+          <InstallCard />
           <BalanceCard balance={balance} income={income} expenses={expenses} />
-          <Button
-            onClick={handleAdd}
-            className="w-full h-12 rounded-[14px] text-[15px] font-semibold"
-            style={{ background: 'hsl(220, 13%, 18%)', color: 'white' }}
-          >
-            <Plus className="w-5 h-5 mr-2" />
+          <Button onClick={handleAdd} className="w-full">
+            <Plus className="w-5 h-5 mr-2" strokeWidth={2.2} />
             {t.addTransaction}
           </Button>
           <TransactionList

@@ -213,23 +213,23 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
   if (loading) return (
     <div className="safe-top px-5 space-y-3 pt-4">
       <div className="h-8 w-48 rounded-xl skeleton" />
-      <div className="h-24 rounded-2xl skeleton" />
-      <div className="h-20 rounded-2xl skeleton" />
+      <div className="h-24 rounded-[22px] skeleton" />
+      <div className="h-20 rounded-[22px] skeleton" />
     </div>
   )
 
   return (
     <div className="animate-fade-in safe-top">
       <PageHeader
-        title={`${groupEmoji} ${groupName}`}
+        title={groupName}
         back
         right={
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setShowInvite(true)}>
-              <UserPlus className="w-4 h-4" />
+            <Button size="icon" variant="outline" className="w-9 h-9" onClick={() => setShowInvite(true)} aria-label="Convidar">
+              <UserPlus className="w-4 h-4" strokeWidth={1.8} />
             </Button>
-            <Button size="sm" variant="outline" onClick={copyInviteLink}>
-              {copied ? <Check className="w-4 h-4 text-[#34C759]" /> : <Copy className="w-4 h-4" />}
+            <Button size="icon" variant="outline" className="w-9 h-9" onClick={copyInviteLink} aria-label="Copiar link">
+              {copied ? <Check className="w-4 h-4 text-income" /> : <Copy className="w-4 h-4" strokeWidth={1.8} />}
             </Button>
           </div>
         }
@@ -237,7 +237,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
 
       <div className="px-5">
         <Tabs defaultValue="expenses">
-          <TabsList className="w-full mb-4">
+          <TabsList className="w-full mb-4 h-11">
             <TabsTrigger value="expenses" className="flex-1 text-xs">
               <Receipt className="w-3.5 h-3.5 mr-1" />Gastos
             </TabsTrigger>
@@ -251,9 +251,9 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
 
           {/* EXPENSES */}
           <TabsContent value="expenses">
-            <div className="mb-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
-              <p className="text-xs text-muted-foreground">{t.totalExpenses}</p>
-              <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+            <div className="mb-3 p-5 bg-card rounded-[22px]">
+              <p className="section-label">{t.totalExpenses}</p>
+              <p className="text-[32px] font-bold tracking-[-1px] mt-1 tabular-nums">{formatCurrency(totalExpenses)}</p>
               {members.length > 0 && (
                 <p className="text-sm text-muted-foreground">
                   {formatCurrency(totalExpenses / members.length)} {t.perPerson}
@@ -269,10 +269,8 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                 <p className="text-sm">{t.noExpenses}</p>
               </div>
             ) : expenses.map(exp => (
-              <div key={exp.id} className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-[#AF52DE]/10 flex items-center justify-center flex-shrink-0">
-                  <Receipt className="w-5 h-5 text-[#AF52DE]" />
-                </div>
+              <div key={exp.id} className="flex items-center gap-3.5 p-4 bg-card rounded-[22px] mb-2">
+                <div className="icon-tile"><Receipt className="w-5 h-5" strokeWidth={1.8} /></div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[15px] truncate">{exp.description}</p>
                   <p className="text-xs text-muted-foreground">
@@ -293,7 +291,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
           <TabsContent value="balances">
             <div className="space-y-2">
               {balances.map((b, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
+                <div key={i} className="flex items-center justify-between p-4 bg-card rounded-[22px]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-semibold">
                       {b.name[0]?.toUpperCase()}
@@ -304,22 +302,22 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                     </div>
                   </div>
                   <p className={cn('font-semibold text-[15px]',
-                    b.net > 0.01 ? 'text-[#34C759]' : b.net < -0.01 ? 'text-[#FF3B30]' : 'text-muted-foreground'
+                    b.net > 0.01 ? 'text-income' : b.net < -0.01 ? 'text-warn' : 'text-muted-foreground'
                   )}>
                     {b.net > 0.01 ? '+' : ''}{formatCurrency(b.net)}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-3">🟢 a receber · 🔴 a pagar</p>
+            <p className="text-xs text-muted-foreground text-center mt-3">Verde: a receber · Laranja: a pagar</p>
           </TabsContent>
 
           {/* MEMBERS */}
           <TabsContent value="members">
             <div className="space-y-2">
               {members.map((m, i) => (
-                <div key={i} className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold text-primary">
+                <div key={i} className="flex items-center gap-3 p-4 bg-card rounded-[22px]">
+                  <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-semibold">
                     {m.display_name[0]?.toUpperCase()}
                   </div>
                   <div>
@@ -341,7 +339,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
       <Dialog open={showExpense} onOpenChange={open => !open && setShowExpense(false)}>
         <DialogContent>
           <form onSubmit={addExpense} className="space-y-4">
-            <h2 className="text-[17px] font-semibold">{t.addExpense}</h2>
+            <h2 className="text-[20px] font-bold tracking-tight">{t.addExpense}</h2>
             <div className="space-y-2">
               <Label>{t.description}</Label>
               <Input placeholder="Ex: Jantar, Airbnb, Gasolina..." value={expForm.description}
@@ -365,7 +363,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
               <Input type="date" value={expForm.date} onChange={e => setExpForm(f => ({ ...f, date: e.target.value }))} />
             </div>
             {expForm.amount && members.length > 0 && (
-              <div className="p-3 bg-secondary rounded-xl text-sm text-center text-muted-foreground">
+              <div className="p-3 bg-secondary rounded-2xl text-sm text-center text-muted-foreground">
                 Dividindo igualmente: <strong className="text-foreground">{formatCurrency(expForm.amount / members.length)}</strong> por pessoa
               </div>
             )}
@@ -384,7 +382,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
         <DialogContent>
           <form onSubmit={sendEmailInvite} className="space-y-4">
             <div>
-              <h2 className="text-[17px] font-semibold">Convidar por e-mail</h2>
+              <h2 className="text-[20px] font-bold tracking-tight">Convidar por e-mail</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 Se a pessoa tiver conta no Map Cash, o convite aparecerá para ela ao abrir o app.
               </p>
@@ -412,10 +410,10 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                 {sendingInvite ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enviar convite'}
               </Button>
             </div>
-            <div className="pt-1 border-t">
+            <div className="pt-3 border-t border-border">
               <p className="text-xs text-muted-foreground mb-2">Ou compartilhe o link de convite:</p>
               <Button type="button" variant="outline" size="sm" className="w-full" onClick={copyInviteLink}>
-                {copied ? <><Check className="w-4 h-4 mr-2 text-[#34C759]" />Link copiado!</> : <><Copy className="w-4 h-4 mr-2" />Copiar link de convite</>}
+                {copied ? <><Check className="w-4 h-4 mr-2 text-income" />Link copiado!</> : <><Copy className="w-4 h-4 mr-2" />Copiar link de convite</>}
               </Button>
             </div>
           </form>

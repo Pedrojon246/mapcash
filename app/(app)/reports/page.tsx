@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/layout/page-header'
 import { useI18n } from '@/lib/i18n/context'
-import { formatCurrency, CATEGORY_COLORS, CATEGORY_EMOJIS } from '@/lib/utils'
+import { formatCurrency, CATEGORY_COLORS } from '@/lib/utils'
+import { CategoryIcon } from '@/components/ui/icons'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, LineChart, Line, Legend, PieChart, Pie, Cell,
@@ -46,7 +47,7 @@ function Delta({ current, previous, format: fmt = 'currency' }: { current: numbe
   const pct = Math.round((diff / Math.abs(previous)) * 100)
   if (Math.abs(pct) < 1) return <span className="text-[11px] text-muted-foreground flex items-center gap-0.5"><Minus className="w-3 h-3" /> igual</span>
   const positive = diff > 0
-  const color = positive ? '#34C759' : '#FF3B30'
+  const color = positive ? 'hsl(var(--income))' : 'hsl(var(--muted-foreground))'
   const Icon = positive ? TrendingUp : TrendingDown
   return (
     <span className="text-[11px] font-medium flex items-center gap-0.5" style={{ color }}>
@@ -127,9 +128,9 @@ export default function ReportsPage() {
   if (loading) return (
     <div className="safe-top px-5 space-y-4 pt-4">
       <div className="h-8 w-32 rounded-xl skeleton" />
-      <div className="h-12 rounded-[16px] skeleton" />
-      <div className="h-48 rounded-[20px] skeleton" />
-      <div className="h-48 rounded-[20px] skeleton" />
+      <div className="h-12 rounded-[22px] skeleton" />
+      <div className="h-48 rounded-[22px] skeleton" />
+      <div className="h-48 rounded-[22px] skeleton" />
     </div>
   )
 
@@ -140,8 +141,8 @@ export default function ReportsPage() {
         large
         right={
           <button onClick={openTutModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-muted-foreground text-[12px] font-medium pressable">
-            <BookOpen className="w-3.5 h-3.5" /> Tutoriais
+            className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-secondary text-muted-foreground text-[12px] font-medium pressable">
+            <BookOpen className="w-3.5 h-3.5" strokeWidth={1.8} /> Tutoriais
           </button>
         }
       />
@@ -153,7 +154,7 @@ export default function ReportsPage() {
           <button
             onClick={() => selectedIdx > 0 && setSelectedMonth(months[selectedIdx - 1].month)}
             disabled={selectedIdx <= 0}
-            className="p-2 rounded-full bg-secondary pressable disabled:opacity-30"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-card pressable disabled:opacity-30"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -169,13 +170,13 @@ export default function ReportsPage() {
                     onClick={() => setSelectedMonth(m.month)}
                     className={`flex-shrink-0 px-4 py-2 rounded-full text-[13px] font-medium transition-all pressable ${
                       active
-                        ? 'bg-foreground text-background'
-                        : 'bg-secondary text-muted-foreground'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-muted-foreground'
                     }`}
                   >
                     {m.label}
                     {hasActivity && !active && (
-                      <span className="ml-1 w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                      <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-muted-foreground inline-block" />
                     )}
                   </button>
                 )
@@ -186,15 +187,15 @@ export default function ReportsPage() {
           <button
             onClick={() => selectedIdx < months.length - 1 && setSelectedMonth(months[selectedIdx + 1].month)}
             disabled={selectedIdx >= months.length - 1}
-            className="p-2 rounded-full bg-secondary pressable disabled:opacity-30"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-card pressable disabled:opacity-30"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {!currentHasData ? (
-          <div className="flex flex-col items-center justify-center py-12 bg-card rounded-[20px] border border-border/40 text-center">
-            <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" />
+          <div className="flex flex-col items-center justify-center py-12 bg-card rounded-[22px] text-center">
+            <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" strokeWidth={1.6} />
             <p className="text-[15px] font-medium">Sem dados em {currentSummary?.label}</p>
             <p className="text-[13px] text-muted-foreground mt-1">Adicione lançamentos para ver o resumo.</p>
           </div>
@@ -203,14 +204,13 @@ export default function ReportsPage() {
             {/* Summary cards for selected month */}
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: 'Receita', value: currentSummary?.income || 0, prev: prevSummary?.income, color: '#34C759' },
-                { label: 'Despesas', value: currentSummary?.expenses || 0, prev: prevSummary?.expenses, color: '#FF3B30' },
-                { label: 'Guardado', value: Math.max(currentSummary?.savings || 0, 0), prev: prevSummary ? Math.max(prevSummary.savings, 0) : undefined, color: '#007AFF', sub: `${currentSummary?.savingsPct || 0}%` },
+                { label: 'Receita', value: currentSummary?.income || 0, prev: prevSummary?.income, color: 'hsl(var(--income))' },
+                { label: 'Despesas', value: currentSummary?.expenses || 0, prev: prevSummary?.expenses, color: 'hsl(var(--foreground))' },
+                { label: 'Guardado', value: Math.max(currentSummary?.savings || 0, 0), prev: prevSummary ? Math.max(prevSummary.savings, 0) : undefined, color: 'hsl(var(--foreground))', sub: `${currentSummary?.savingsPct || 0}%` },
               ].map(item => (
-                <div key={item.label} className="p-3.5 bg-card rounded-[18px] border border-border/40"
-                  style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.05)' }}>
+                <div key={item.label} className="p-3.5 bg-card rounded-[22px]">
                   <p className="text-[11px] text-muted-foreground mb-1">{item.label}</p>
-                  <p className="text-[14px] font-bold leading-tight" style={{ color: item.color }}>
+                  <p className="text-[15px] font-bold leading-tight tracking-tight tabular-nums" style={{ color: item.color }}>
                     {formatCurrency(item.value)}
                   </p>
                   {item.sub && <p className="text-[10px] text-muted-foreground">{item.sub} renda</p>}
@@ -227,8 +227,7 @@ export default function ReportsPage() {
 
         {/* 6-month trend — always visible if any data */}
         {hasData && trendData.length > 0 && (
-          <div className="p-5 bg-card rounded-[20px] border border-border/40"
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div className="p-5 bg-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-1">Evolução dos últimos meses</p>
             <p className="text-[12px] text-muted-foreground mb-4">Receita, despesas e quanto guardou</p>
             <ResponsiveContainer width="100%" height={180}>
@@ -238,9 +237,9 @@ export default function ReportsPage() {
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                <Line type="monotone" dataKey="Receita" stroke="#34C759" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="Despesas" stroke="#FF3B30" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-                <Line type="monotone" dataKey="Guardado" stroke="#007AFF" strokeWidth={2} strokeDasharray="4 2" dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Receita" stroke="hsl(var(--income))" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Despesas" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                <Line type="monotone" dataKey="Guardado" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="4 2" dot={{ r: 3 }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -248,8 +247,7 @@ export default function ReportsPage() {
 
         {/* Month bar comparison */}
         {hasData && trendData.length > 1 && (
-          <div className="p-5 bg-card rounded-[20px] border border-border/40"
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div className="p-5 bg-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-4">Receita vs Despesas por mês</p>
             <ResponsiveContainer width="100%" height={150}>
               <BarChart data={trendData} barGap={2} margin={{ left: -20 }}>
@@ -257,8 +255,8 @@ export default function ReportsPage() {
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="Receita" fill="#34C759" radius={[4, 4, 0, 0]} maxBarSize={24} />
-                <Bar dataKey="Despesas" fill="#FF3B30" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="Receita" fill="hsl(var(--income))" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="Despesas" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} maxBarSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -266,8 +264,7 @@ export default function ReportsPage() {
 
         {/* Category breakdown for selected month */}
         {currentHasData && pieData.length > 0 && (
-          <div className="p-5 bg-card rounded-[20px] border border-border/40"
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <div className="p-5 bg-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-4">
               Gastos por categoria — {currentSummary?.label}
             </p>
@@ -290,12 +287,13 @@ export default function ReportsPage() {
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                         style={{ background: CATEGORY_COLORS[item.cat] || '#8E8E93' }} />
-                      <span className="text-[13px]">{CATEGORY_EMOJIS[item.cat]} {item.name}</span>
+                      <CategoryIcon category={item.cat} className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-[13px]">{item.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[13px] font-semibold">{formatCurrency(item.value)}</span>
                       {prevCat > 0 && (
-                        <span className={`text-[10px] font-medium ${diff > 0 ? 'text-[#FF3B30]' : 'text-[#34C759]'}`}>
+                        <span className={`text-[10px] font-medium ${diff > 0 ? 'text-warn' : 'text-income'}`}>
                           {diff > 0 ? '+' : ''}{formatCurrency(diff)}
                         </span>
                       )}
@@ -308,8 +306,8 @@ export default function ReportsPage() {
         )}
 
         {!hasData && (
-          <div className="flex flex-col items-center justify-center py-16 bg-card rounded-[20px] border border-border/40 text-center">
-            <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" />
+          <div className="flex flex-col items-center justify-center py-16 bg-card rounded-[22px] text-center">
+            <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" strokeWidth={1.6} />
             <p className="text-[15px] font-medium">{t.noData}</p>
             <p className="text-[13px] text-muted-foreground mt-1">{t.noDataDesc}</p>
           </div>

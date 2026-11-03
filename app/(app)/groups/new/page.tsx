@@ -9,9 +9,8 @@ import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
+import { GlyphIcon, GROUP_GLYPHS } from '@/components/ui/icons'
 import { Loader2 } from 'lucide-react'
-
-const EMOJIS = ['✈️', '🏖️', '🏕️', '🎉', '🍕', '🎮', '🏠', '🎵', '🌍', '💼', '🎓', '❤️']
 
 export default function NewGroupPage() {
   const [name, setName] = useState('')
@@ -58,7 +57,7 @@ export default function NewGroupPage() {
 
       if (memberError) throw memberError
 
-      toast({ variant: 'success', title: 'Grupo criado! 🎉' })
+      toast({ variant: 'success', title: 'Grupo criado!' })
       router.push(`/groups/${groupId}`)
 
     } catch (err: any) {
@@ -82,28 +81,28 @@ export default function NewGroupPage() {
           <div className="space-y-3">
             <Label>Ícone do grupo</Label>
             <div className="grid grid-cols-6 gap-2">
-              {EMOJIS.map(e => (
+              {GROUP_GLYPHS.map(e => (
                 <button
                   key={e}
                   type="button"
                   onClick={() => setEmoji(e)}
                   className={cn(
-                    'text-2xl h-12 rounded-xl transition-all pressable',
+                    'h-12 rounded-2xl flex items-center justify-center transition-all pressable',
                     emoji === e
-                      ? 'bg-primary/15 scale-110 shadow-apple-sm'
-                      : 'bg-secondary hover:bg-accent'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-muted-foreground'
                   )}
                 >
-                  {e}
+                  <GlyphIcon glyph={e} className="w-5 h-5" />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Preview */}
-          <div className="flex items-center gap-4 p-4 bg-secondary rounded-2xl">
-            <div className="w-14 h-14 rounded-2xl bg-[#AF52DE]/15 flex items-center justify-center text-3xl flex-shrink-0">
-              {emoji}
+          <div className="flex items-center gap-4 p-4 bg-card rounded-[22px]">
+            <div className="icon-tile" style={{ width: 52, height: 52, borderRadius: 16 }}>
+              <GlyphIcon glyph={emoji} className="w-6 h-6" />
             </div>
             <div>
               <p className="font-semibold text-[15px]">{name || 'Nome do grupo'}</p>

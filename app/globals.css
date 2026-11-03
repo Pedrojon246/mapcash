@@ -4,73 +4,61 @@
 
 @layer base {
   :root {
-    /* Apple Light — neutral, premium */
-    --background: 0 0% 96%;          /* #F2F2F7 */
-    --background-2: 0 0% 100%;       /* white cards */
-    --background-3: 0 0% 94%;        /* grouped sections */
-    --foreground: 0 0% 7%;           /* near black */
-    --foreground-2: 0 0% 40%;        /* secondary text */
-    --foreground-3: 0 0% 60%;        /* tertiary text */
-
+    /* Map Cash — light (Apple grouped) */
+    --background: 240 24% 96%;       /* #F2F2F7 */
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
+    --popover-foreground: 0 0% 0%;
 
-    /* Accent — charcoal/graphite, not blue */
-    --primary: 220 13% 18%;          /* #252A31 — dark graphite */
+    --primary: 0 0% 0%;              /* black button in light */
     --primary-foreground: 0 0% 100%;
-
-    --secondary: 0 0% 94%;
-    --secondary-foreground: 0 0% 20%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 54%;
-    --accent: 0 0% 92%;
-    --accent-foreground: 0 0% 7%;
-    --destructive: 3 95% 55%;
+    --secondary: 240 12% 93%;        /* #ECECF1 */
+    --secondary-foreground: 0 0% 15%;
+    --muted: 240 12% 93%;
+    --muted-foreground: 240 2% 43%;  /* #6C6C70 */
+    --accent: 240 10% 90%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 3 100% 59%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 94%;
-    --ring: 220 13% 18%;
+    --border: 240 10% 90%;           /* #E5E5EA */
+    --input: 240 12% 93%;
+    --ring: 0 0% 0%;
     --radius: 14px;
 
-    /* Brand colors — used sparingly */
-    --income-color: 142 55% 38%;     /* rich green */
-    --expense-color: 3 90% 54%;      /* clean red */
-    --savings-color: 211 90% 52%;    /* blue */
-    --warning-color: 35 100% 50%;    /* amber */
+    /* Only two accents: green = money in, orange = limit alerts */
+    --income: 140 67% 36%;           /* #1F9D4D */
+    --warn: 35 100% 50%;             /* #FF9F0A-ish */
   }
 
   .dark {
-    /* Apple Dark — true black system */
-    --background: 0 0% 0%;           /* #000000 */
-    --background-2: 0 0% 11%;        /* #1C1C1E cards */
-    --background-3: 0 0% 7%;         /* #111113 */
+    /* Map Cash — dark (true black) */
+    --background: 0 0% 0%;           /* #000 */
     --foreground: 0 0% 100%;
-    --foreground-2: 0 0% 60%;
-    --foreground-3: 0 0% 38%;
-
-    --card: 0 0% 11%;                /* #1C1C1E */
+    --card: 240 3% 11%;              /* #1C1C1E */
     --card-foreground: 0 0% 100%;
-    --popover: 0 0% 14%;
+    --popover: 240 3% 14%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 0 0% 100%;            /* white as primary in dark */
+    --primary: 0 0% 100%;            /* white button in dark */
     --primary-foreground: 0 0% 0%;
-
-    --secondary: 0 0% 16%;           /* #2C2C2E */
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 16%;
-    --muted-foreground: 0 0% 52%;
-    --accent: 0 0% 20%;              /* #333333 */
+    --secondary: 240 3% 17%;         /* #2C2C2E */
+    --secondary-foreground: 0 0% 92%;
+    --muted: 240 3% 17%;
+    --muted-foreground: 240 2% 56%;  /* #8E8E93 */
+    --accent: 240 3% 20%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 3 95% 60%;
+    --destructive: 3 100% 61%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;              /* subtle separator */
-    --input: 0 0% 16%;
+    --border: 240 3% 17%;            /* #2C2C2E */
+    --input: 240 3% 17%;
     --ring: 0 0% 80%;
+
+    --income: 135 64% 51%;           /* #30D158 */
+    --warn: 36 100% 52%;             /* #FF9F0A */
   }
 }
 
@@ -100,40 +88,42 @@
 
 @layer components {
 
-  /* ── Glass morphism — Apple style ── */
+  /* ── Floating translucent surface (tab bar, sheets) ── */
   .glass {
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    background: rgba(242, 242, 247, 0.85);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    background: rgba(255, 255, 255, 0.78);
   }
-  .dark .glass {
-    background: rgba(28, 28, 30, 0.88);
-  }
+  .dark .glass { background: rgba(28, 28, 30, 0.78); }
 
   /* ── Pressable — physical touch feel ── */
   .pressable {
     @apply transition-all duration-150 cursor-pointer;
     -webkit-tap-highlight-color: transparent;
   }
-  .pressable:active {
-    transform: scale(0.96);
-    opacity: 0.75;
+  .pressable:active { transform: scale(0.97); opacity: 0.8; }
+
+  /* ── Surfaces ── */
+  .card-premium { @apply bg-card rounded-[22px] overflow-hidden; }
+
+  /* Grouped list (iOS Settings style): hairline between rows */
+  .list-group { @apply bg-card rounded-[22px] overflow-hidden; }
+  .list-group > * + * { border-top: 0.5px solid hsl(var(--border)); }
+
+  /* Neutral icon tile */
+  .icon-tile {
+    @apply flex items-center justify-center flex-shrink-0 bg-secondary text-foreground;
+    width: 40px; height: 40px; border-radius: 12px;
   }
 
-  /* ── Premium card ── */
-  .card-premium {
-    @apply bg-card rounded-[20px] overflow-hidden;
-    box-shadow: 
-      0 1px 0 rgba(255,255,255,0.06) inset,
-      0 2px 8px rgba(0,0,0,0.06),
-      0 0 0 0.5px rgba(0,0,0,0.08);
+  /* Section label (small caps feel) */
+  .section-label {
+    @apply text-muted-foreground;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
   }
-  .dark .card-premium {
-    box-shadow:
-      0 1px 0 rgba(255,255,255,0.04) inset,
-      0 4px 16px rgba(0,0,0,0.4),
-      0 0 0 0.5px rgba(255,255,255,0.04);
-  }
+
+  /* Big money numeral */
+  .numeral { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.05; font-variant-numeric: tabular-nums; }
 
   /* ── Skeleton loader ── */
   .skeleton {
@@ -149,7 +139,7 @@
   }
 
   /* ── Typography scale ── */
-  .text-display { font-size: 48px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+  .text-display { font-size: 40px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
   .text-title-1 { font-size: 32px; font-weight: 700; letter-spacing: -0.8px; }
   .text-title-2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
   .text-title-3 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }

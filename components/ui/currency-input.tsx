@@ -46,10 +46,10 @@ export function CurrencyInput({
         required={required}
         autoFocus={autoFocus}
         className={cn(
-          'w-full rounded-xl border border-input bg-secondary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 transition-all font-medium',
+          'w-full rounded-2xl bg-secondary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/40 transition-all font-semibold tracking-tight',
           size === 'large'
-            ? 'h-16 pl-14 pr-4 text-2xl'
-            : 'h-12 pl-12 pr-4 text-[15px]'
+            ? 'h-16 pl-14 pr-4 text-3xl'
+            : 'h-[52px] pl-12 pr-4 text-[16px]'
         )}
       />
     </div>

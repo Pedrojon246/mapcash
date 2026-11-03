@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { formatCurrency, formatDate, CATEGORY_EMOJIS, CATEGORY_COLORS, cn } from '@/lib/utils'
+import { formatCurrency, formatDate, cn } from '@/lib/utils'
+import { CategoryIcon } from '@/components/ui/icons'
 import { useI18n } from '@/lib/i18n/context'
 import { toast } from '@/components/ui/use-toast'
 import {
@@ -9,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { Transaction } from '@/lib/supabase/types'
-import { Trash2, Pencil, Receipt } from 'lucide-react'
+import { Trash2, Receipt } from 'lucide-react'
 
 interface TransactionListProps {
   transactions: Transaction[]
@@ -41,15 +42,15 @@ export function TransactionList({ transactions, loading, onEdit, onDeleted }: Tr
   if (loading) return (
     <div className="space-y-3 mt-2">
       {[1, 2, 3].map(i => (
-        <div key={i} className="h-16 rounded-2xl skeleton" />
+        <div key={i} className="h-[68px] rounded-[22px] skeleton" />
       ))}
     </div>
   )
 
   if (transactions.length === 0) return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
-        <Receipt className="w-8 h-8 text-muted-foreground" />
+      <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4">
+        <Receipt className="w-7 h-7 text-muted-foreground" strokeWidth={1.6} />
       </div>
       <p className="font-semibold text-foreground">{t.noTransactions}</p>
       <p className="text-sm text-muted-foreground mt-1">{t.noTransactionsDesc}</p>
@@ -66,51 +67,41 @@ export function TransactionList({ transactions, loading, onEdit, onDeleted }: Tr
 
   return (
     <>
-      <div className="space-y-4 pb-4">
+      <div className="space-y-5 pb-4">
         {Object.entries(grouped).map(([date, txs]) => (
           <div key={date}>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-              {formatDate(date)}
-            </p>
-            <div className="space-y-2">
+            <p className="section-label mb-2 px-1">{formatDate(date)}</p>
+            <div className="list-group">
               {txs.map(tx => (
                 <div
                   key={tx.id}
-                  className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-apple-sm border border-border/50 pressable group"
+                  className="flex items-center gap-3.5 px-4 py-3.5 pressable group"
                   onClick={() => onEdit(tx)}
                 >
-                  {/* Category icon */}
-                  <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                    style={{ background: CATEGORY_COLORS[tx.category] + '20' }}
-                  >
-                    {CATEGORY_EMOJIS[tx.category]}
+                  <div className="icon-tile">
+                    <CategoryIcon category={tx.category} />
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[15px] truncate">{tx.description}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="font-medium text-[15px] truncate tracking-tight">{tx.description}</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">
                       {t.categories[tx.category as keyof typeof t.categories]}
                     </p>
                   </div>
 
-                  {/* Amount */}
-                  <div className="text-right flex-shrink-0">
-                    <p className={cn(
-                      'font-semibold text-[15px]',
-                      tx.type === 'income' ? 'text-[#34C759]' : 'text-foreground'
-                    )}>
-                      {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
-                    </p>
-                  </div>
+                  <p className={cn(
+                    'font-semibold text-[15px] tabular-nums tracking-tight flex-shrink-0',
+                    tx.type === 'income' ? 'text-income' : 'text-foreground'
+                  )}>
+                    {tx.type === 'income' ? '+' : '−'}{formatCurrency(tx.amount)}
+                  </p>
 
-                  {/* Delete button */}
                   <button
                     onClick={e => { e.stopPropagation(); setDeleteId(tx.id) }}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-all ml-1"
+                    aria-label="Excluir"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full text-muted-foreground hover:text-destructive transition-all"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" strokeWidth={1.8} />
                   </button>
                 </div>
               ))}

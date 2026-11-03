@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { TUTORIALS, type TutorialScreen, resetAllTutorials } from '@/lib/hooks/use-tutorial'
-import { X, ChevronRight, ChevronLeft, BookOpen } from 'lucide-react'
+import { X, ChevronRight, ChevronLeft, BookOpen, Check } from 'lucide-react'
+import { GlyphIcon } from '@/components/ui/icons'
 
 interface TutorialOverlayProps {
   screen: TutorialScreen
@@ -32,11 +33,11 @@ export function TutorialOverlay({ screen, visible, onDismiss, onSkipAll }: Tutor
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-end pb-32 px-5"
-      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
     >
       {/* Card */}
       <div className="w-full max-w-sm animate-bounce-in">
-        <div className="bg-card rounded-[24px] overflow-hidden shadow-2xl">
+        <div className="bg-card rounded-[28px] overflow-hidden shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between px-5 pt-5 pb-4">
             <div className="flex items-center gap-2">
@@ -62,7 +63,9 @@ export function TutorialOverlay({ screen, visible, onDismiss, onSkipAll }: Tutor
 
           {/* Content */}
           <div className="px-5 pb-5">
-            <div className="text-4xl mb-4">{current.icon}</div>
+            <div className="icon-tile mb-4" style={{ width: 52, height: 52, borderRadius: 16 }}>
+              <GlyphIcon glyph={current.icon} className="w-6 h-6" />
+            </div>
             <h3 className="text-[20px] font-bold tracking-tight mb-2">{current.title}</h3>
             <p className="text-[15px] text-muted-foreground leading-relaxed">{current.text}</p>
           </div>
@@ -75,9 +78,8 @@ export function TutorialOverlay({ screen, visible, onDismiss, onSkipAll }: Tutor
                 <ChevronLeft className="w-5 h-5" />
               </button>
             )}
-            <Button onClick={next} className="flex-1 h-12 rounded-[14px] text-[15px] font-semibold"
-              style={{ background: 'hsl(220, 13%, 18%)', color: 'white' }}>
-              {isLast ? 'Entendido! ✓' : (
+            <Button onClick={next} className="flex-1">
+              {isLast ? <span className="flex items-center gap-1.5">Entendido <Check className="w-4 h-4" strokeWidth={2.4} /></span> : (
                 <span className="flex items-center gap-1">Próximo <ChevronRight className="w-4 h-4" /></span>
               )}
             </Button>
@@ -118,11 +120,11 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
         onClick={e => e.target === e.currentTarget && (setSelected(null), setStep(0))}
       >
         <div className="w-full max-w-sm animate-slide-up mb-8 mx-5">
-          <div className="bg-card rounded-[24px] shadow-2xl overflow-hidden">
+          <div className="bg-card rounded-[28px] shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-5 pt-5 pb-4">
               <button onClick={() => { setSelected(null); setStep(0) }}
-                className="text-[15px] text-blue-500 font-medium pressable">
-                ← Voltar
+                className="text-[15px] text-foreground font-medium pressable flex items-center gap-0.5">
+                <ChevronLeft className="w-4 h-4" /> Voltar
               </button>
               <span className="text-[13px] font-semibold text-muted-foreground">
                 {tutorial.title}
@@ -140,7 +142,9 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
             </div>
 
             <div className="px-5 pb-5">
-              <div className="text-4xl mb-4">{current.icon}</div>
+              <div className="icon-tile mb-4" style={{ width: 52, height: 52, borderRadius: 16 }}>
+              <GlyphIcon glyph={current.icon} className="w-6 h-6" />
+            </div>
               <h3 className="text-[20px] font-bold tracking-tight mb-2">{current.title}</h3>
               <p className="text-[15px] text-muted-foreground leading-relaxed">{current.text}</p>
             </div>
@@ -153,9 +157,8 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
                 </button>
               )}
               <Button onClick={() => isLast ? (setSelected(null), setStep(0)) : setStep(s => s + 1)}
-                className="flex-1 h-12 rounded-[14px] text-[15px] font-semibold"
-                style={{ background: 'hsl(220, 13%, 18%)', color: 'white' }}>
-                {isLast ? 'Concluído ✓' : <span className="flex items-center gap-1">Próximo <ChevronRight className="w-4 h-4" /></span>}
+                className="flex-1">
+                {isLast ? <span className="flex items-center gap-1.5">Concluído <Check className="w-4 h-4" strokeWidth={2.4} /></span> : <span className="flex items-center gap-1">Próximo <ChevronRight className="w-4 h-4" /></span>}
               </Button>
             </div>
           </div>
@@ -170,10 +173,10 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-sm animate-slide-up mb-8 mx-5">
-        <div className="bg-card rounded-[24px] shadow-2xl overflow-hidden">
+        <div className="bg-card rounded-[28px] shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between px-5 pt-5 pb-4">
             <div>
-              <h2 className="text-[20px] font-bold">Tutoriais</h2>
+              <h2 className="text-[22px] font-bold tracking-tight">Tutoriais</h2>
               <p className="text-[13px] text-muted-foreground">Aprenda a usar cada seção</p>
             </div>
             <button onClick={onClose} className="p-2 rounded-full bg-secondary pressable">
@@ -181,14 +184,14 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
             </button>
           </div>
 
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border border-t border-border">
             {screens.map(screen => {
               const t = TUTORIALS[screen]
               return (
                 <button key={screen} onClick={() => { setSelected(screen); setStep(0) }}
                   className="w-full flex items-center justify-between px-5 py-4 hover:bg-secondary/50 pressable">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{t.steps[0].icon}</span>
+                    <div className="icon-tile"><GlyphIcon glyph={t.steps[0].icon} /></div>
                     <div className="text-left">
                       <p className="text-[15px] font-semibold">{t.title}</p>
                       <p className="text-[12px] text-muted-foreground">{t.steps.length} dicas</p>

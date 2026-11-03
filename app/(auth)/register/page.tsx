@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
-import { Loader2, MapPin, MailCheck } from 'lucide-react'
+import { Loader2, MailCheck } from 'lucide-react'
+import { Logo } from '@/components/shared/logo'
+import { GoogleButton, OrDivider } from '@/components/auth/google-button'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -44,10 +46,10 @@ export default function RegisterPage() {
   if (done) return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background safe-top">
       <div className="w-full max-w-sm text-center animate-scale-in">
-        <div className="w-20 h-20 rounded-[22px] bg-primary/10 flex items-center justify-center mx-auto mb-6">
-          <MailCheck className="w-10 h-10 text-primary" />
+        <div className="w-20 h-20 rounded-[26px] bg-card flex items-center justify-center mx-auto mb-6">
+          <MailCheck className="w-9 h-9 text-foreground" strokeWidth={1.6} />
         </div>
-        <h1 className="text-2xl font-bold mb-2">Confirme seu e-mail</h1>
+        <h1 className="text-[26px] font-bold tracking-tight mb-2">Confirme seu e-mail</h1>
         <p className="text-muted-foreground text-[15px] leading-relaxed mb-2">
           Enviamos um link de confirmação para
         </p>
@@ -69,14 +71,13 @@ export default function RegisterPage() {
     <div className="min-h-screen flex flex-col bg-background safe-top">
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
         <div className="mb-8 text-center animate-fade-in">
-          <div className="w-20 h-20 rounded-[22px] bg-primary flex items-center justify-center mx-auto mb-4 shadow-apple-lg">
-            <MapPin className="w-10 h-10 text-white" strokeWidth={2} />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">{t.appName}</h1>
+          <Logo className="mx-auto mb-5" />
+          <h1 className="text-[32px] font-bold tracking-[-0.8px]">{t.appName}</h1>
         </div>
 
         <div className="w-full max-w-sm animate-slide-up">
-          <h2 className="text-2xl font-bold mb-6">{t.createAccount}</h2>
+          <GoogleButton label="Cadastrar com Google" />
+          <OrDivider />
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label>{t.name}</Label>
@@ -94,9 +95,9 @@ export default function RegisterPage() {
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t.createFree}
             </Button>
           </form>
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-[14px] text-muted-foreground mt-6">
             {t.hasAccount}{' '}
-            <Link href="/login" className="text-primary font-semibold hover:underline">{t.login}</Link>
+            <Link href="/login" className="text-foreground font-semibold underline underline-offset-4">{t.login}</Link>
           </p>
         </div>
       </div>

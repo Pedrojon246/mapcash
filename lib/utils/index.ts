@@ -32,42 +32,39 @@ export function currentMonth(): string {
   return format(new Date(), 'yyyy-MM')
 }
 
+/** Safe [start, nextStart) range for a 'yyyy-MM' month — never builds invalid dates like 11-31 */
+export function monthRange(month: string): { start: string; end: string } {
+  const [y, m] = month.split('-').map(Number)
+  const ny = m === 12 ? y + 1 : y
+  const nm = m === 12 ? 1 : m + 1
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return { start: `${y}-${pad(m)}-01`, end: `${ny}-${pad(nm)}-01` }
+}
+
 export function generateInviteToken(): string {
   return Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
 }
 
+// Neutral, tonal ramp (premium look): no rainbow. Used only in charts/bars.
 export const CATEGORY_COLORS: Record<string, string> = {
-  food_home: '#34C759',
-  food_out: '#FF9500',
-  transport: '#007AFF',
-  housing: '#5856D6',
-  health: '#FF2D55',
-  education: '#30B0C7',
-  entertainment: '#AF52DE',
-  shopping: '#FF6B35',
-  travel: '#5AC8FA',
-  salary: '#34C759',
-  freelance: '#007AFF',
-  investment: '#5856D6',
-  other: '#8E8E93',
+  food_home: '#B8B8BD',
+  food_out: '#A4A4A9',
+  transport: '#909096',
+  housing: '#7D7D83',
+  health: '#6C6C72',
+  education: '#C8C8CC',
+  entertainment: '#58585E',
+  shopping: '#9A9AA0',
+  travel: '#85858B',
+  salary: '#30D158',
+  freelance: '#30D158',
+  investment: '#30D158',
+  other: '#707076',
 }
 
-export const CATEGORY_EMOJIS: Record<string, string> = {
-  food_home: '🛒',
-  food_out: '🍔',
-  transport: '🚗',
-  housing: '🏠',
-  health: '💊',
-  education: '📚',
-  entertainment: '🎮',
-  shopping: '🛍️',
-  travel: '✈️',
-  salary: '💼',
-  freelance: '💻',
-  investment: '📈',
-  other: '📦',
-}
+// Kept for backwards compatibility with text-only contexts (no emoji in UI)
+export const CATEGORY_EMOJIS: Record<string, string> = {}
 
 // Categories that are considered "cuttable" (non-essential)
 export const CUTTABLE_CATEGORIES = ['food_out', 'entertainment', 'shopping', 'travel']
@@ -76,8 +73,8 @@ export const CUTTABLE_CATEGORIES = ['food_out', 'entertainment', 'shopping', 'tr
 export const ESSENTIAL_CATEGORIES = ['food_home', 'transport', 'housing', 'health', 'education']
 
 export const GOAL_COLORS = [
-  '#007AFF', '#34C759', '#FF9500', '#FF3B30',
-  '#AF52DE', '#FF2D55', '#5AC8FA', '#5856D6',
+  '#FFFFFF', '#30D158', '#C7C7CC', '#8E8E93',
+  '#FF9F0A', '#AEAEB2', '#636366', '#E5E5EA',
 ]
 
 export const GOAL_EMOJIS = [
