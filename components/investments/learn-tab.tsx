@@ -5,6 +5,7 @@ import { ArrowRight, Calculator, Check, ChevronRight, Circle } from 'lucide-reac
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, cn } from '@/lib/utils'
 import { PRODUCTS, LESSONS, TRAIL, RISK_LABEL, DISCLAIMER } from '@/lib/investments/content'
+import { GOAL_OPTIONS } from '@/components/shared/goal-onboarding'
 import { TopicIcon } from '@/components/investments/topic-icon'
 import type { Goal } from '@/lib/supabase/types'
 
@@ -15,6 +16,7 @@ interface TrailData {
   txLast30: number
   avgExpense: number
   reserve: Goal | null
+  goal: string | null
 }
 
 export function LearnTab() {
@@ -41,6 +43,7 @@ export function LearnTab() {
         txLast30: rows.filter(r => r.date >= iso(since30)).length,
         avgExpense: expenses / 3,
         reserve: ((goals || []) as Goal[]).find(g => /reserva|emerg/i.test(g.name)) || null,
+        goal: (user.user_metadata?.goal as string) || null,
       })
     })()
   }, [supabase])
@@ -60,8 +63,13 @@ export function LearnTab() {
     'renda-fixa': manual.includes('renda-fixa'),
     diversificar: manual.includes('diversificar'),
   }
-  const currentIdx = Math.max(TRAIL.findIndex(s => !done[s.id]), 0)
-  const allDone = TRAIL.every(s => done[s.id])
+  // The priority picked at onboarding decides where the trail starts
+  const START_STEP: Record<string, string> = { organizar: 'organizar', dividas: 'dividas', meta: 'reserva', investir: 'renda-fixa' }
+  const startIdx = Math.max(TRAIL.findIndex(s => s.id === START_STEP[data?.goal || '']), 0)
+  const firstUndone = TRAIL.findIndex((s, i) => i >= startIdx && !done[s.id])
+  const allDone = TRAIL.slice(startIdx).every(s => done[s.id])
+  const currentIdx = firstUndone === -1 ? startIdx : firstUndone
+  const focus = GOAL_OPTIONS.find(o => o.id === data?.goal)
   const current = TRAIL[currentIdx]
 
   let detail = current.description
@@ -83,7 +91,7 @@ export function LearnTab() {
       ) : (
         <div>
           <div className="glass-card glass-hero rounded-[26px] p-5">
-            <p className="section-label">Sua trilha</p>
+            <p className="section-label">Sua trilha{focus ? ` · ${focus.title}` : ''}</p>
             <p className="text-[22px] font-semibold tracking-tight mt-1.5 leading-tight">
               {allDone ? 'Trilha concluída' : current.title}
             </p>
