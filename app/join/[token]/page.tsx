@@ -79,7 +79,7 @@ export default function JoinPage({ params }: { params: { token: string } }) {
   )
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 safe-top safe-bottom">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 safe-top safe-bottom">
       <div className="w-full max-w-sm">
         {/* App logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -116,7 +116,7 @@ export default function JoinPage({ params }: { params: { token: string } }) {
             <div className="relative flex justify-center text-xs"><span className="bg-background px-3 text-muted-foreground">ou</span></div>
           </div>
 
-          <div className="space-y-3 p-4 bg-card rounded-[22px]">
+          <div className="space-y-3 p-4 glass-card rounded-[22px]">
             <Label>{t.guestName}</Label>
             <Input
               placeholder="Seu nome"

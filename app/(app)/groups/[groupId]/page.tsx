@@ -251,7 +251,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
 
           {/* EXPENSES */}
           <TabsContent value="expenses">
-            <div className="mb-3 p-5 bg-card rounded-[22px]">
+            <div className="mb-3 p-5 glass-card rounded-[22px]">
               <p className="section-label">{t.totalExpenses}</p>
               <p className="text-[32px] font-bold tracking-[-1px] mt-1 tabular-nums">{formatCurrency(totalExpenses)}</p>
               {members.length > 0 && (
@@ -269,7 +269,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
                 <p className="text-sm">{t.noExpenses}</p>
               </div>
             ) : expenses.map(exp => (
-              <div key={exp.id} className="flex items-center gap-3.5 p-4 bg-card rounded-[22px] mb-2">
+              <div key={exp.id} className="flex items-center gap-3.5 p-4 glass-card rounded-[22px] mb-2">
                 <div className="icon-tile"><Receipt className="w-5 h-5" strokeWidth={1.8} /></div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[15px] truncate">{exp.description}</p>
@@ -291,7 +291,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
           <TabsContent value="balances">
             <div className="space-y-2">
               {balances.map((b, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-card rounded-[22px]">
+                <div key={i} className="flex items-center justify-between p-4 glass-card rounded-[22px]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-semibold">
                       {b.name[0]?.toUpperCase()}
@@ -316,7 +316,7 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
           <TabsContent value="members">
             <div className="space-y-2">
               {members.map((m, i) => (
-                <div key={i} className="flex items-center gap-3 p-4 bg-card rounded-[22px]">
+                <div key={i} className="flex items-center gap-3 p-4 glass-card rounded-[22px]">
                   <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-semibold">
                     {m.display_name[0]?.toUpperCase()}
                   </div>

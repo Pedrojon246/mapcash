@@ -28,7 +28,7 @@ function CreateButton({ className = '' }: { className?: string }) {
 
 function LoginButton() {
   return (
-    <Link href="/login" className="pressable flex items-center justify-between rounded-[20px] bg-card px-5 py-4">
+    <Link href="/login" className="pressable flex items-center justify-between rounded-[20px] glass-card px-5 py-4">
       <span>
         <span className="block text-[17px] font-semibold tracking-tight">Já tenho conta</span>
         <span className="block text-[13px] text-muted-foreground mt-0.5">Fazer login</span>
@@ -40,7 +40,7 @@ function LoginButton() {
 
 function AppPreview() {
   return (
-    <div className="bg-card rounded-t-[28px] md:rounded-[28px] border border-border border-b-0 md:border-b p-5 md:p-6">
+    <div className="glass-card glass-hero rounded-t-[28px] md:rounded-[28px] p-5 md:p-6">
       <p className="section-label">Saldo do mês</p>
       <p className="numeral mt-1.5 mb-5" style={{ fontSize: 42 }}>R$ 3.420,50</p>
       <div className="flex h-2 gap-[3px] rounded overflow-hidden mb-4">
@@ -74,7 +74,7 @@ export default async function Home() {
 
   return (
     // Always dark: the sales page is the brand's first impression
-    <div className="dark bg-background text-foreground min-h-screen safe-top">
+    <div className="dark ambient bg-background text-foreground min-h-screen safe-top">
       <div className="mx-auto max-w-5xl px-5 md:px-8 pb-10">
 
         <header className="flex items-center justify-between pt-5">

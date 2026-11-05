@@ -124,7 +124,7 @@ export default function GroupsPage() {
               </p>
             </div>
             {invites.map(inv => (
-              <div key={inv.id} className="p-4 bg-card rounded-[22px] ring-1 ring-warn/40">
+              <div key={inv.id} className="p-4 glass-card rounded-[22px] ring-1 ring-warn/40">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="icon-tile"><GlyphIcon glyph={inv.group_emoji} /></div>
                   <div>
@@ -163,7 +163,7 @@ export default function GroupsPage() {
           </div>
         ) : groups.map(g => (
           <Link key={g.id} href={`/groups/${g.id}`}>
-            <div className="flex items-center gap-3.5 p-4 bg-card rounded-[22px] pressable">
+            <div className="flex items-center gap-3.5 p-4 glass-card rounded-[22px] pressable">
               <div className="icon-tile"><GlyphIcon glyph={g.emoji} /></div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-[16px] tracking-tight truncate">{g.name}</p>

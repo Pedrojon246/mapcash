@@ -194,7 +194,7 @@ export default function ReportsPage() {
         </div>
 
         {!currentHasData ? (
-          <div className="flex flex-col items-center justify-center py-12 bg-card rounded-[22px] text-center">
+          <div className="flex flex-col items-center justify-center py-12 glass-card rounded-[22px] text-center">
             <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" strokeWidth={1.6} />
             <p className="text-[15px] font-medium">Sem dados em {currentSummary?.label}</p>
             <p className="text-[13px] text-muted-foreground mt-1">Adicione lançamentos para ver o resumo.</p>
@@ -208,7 +208,7 @@ export default function ReportsPage() {
                 { label: 'Despesas', value: currentSummary?.expenses || 0, prev: prevSummary?.expenses, color: 'hsl(var(--foreground))' },
                 { label: 'Guardado', value: Math.max(currentSummary?.savings || 0, 0), prev: prevSummary ? Math.max(prevSummary.savings, 0) : undefined, color: 'hsl(var(--foreground))', sub: `${currentSummary?.savingsPct || 0}%` },
               ].map(item => (
-                <div key={item.label} className="p-3.5 bg-card rounded-[22px]">
+                <div key={item.label} className="p-3.5 glass-card rounded-[22px]">
                   <p className="text-[11px] text-muted-foreground mb-1">{item.label}</p>
                   <p className="text-[15px] font-bold leading-tight tracking-tight tabular-nums" style={{ color: item.color }}>
                     {formatCurrency(item.value)}
@@ -227,7 +227,7 @@ export default function ReportsPage() {
 
         {/* 6-month trend — always visible if any data */}
         {hasData && trendData.length > 0 && (
-          <div className="p-5 bg-card rounded-[22px]">
+          <div className="p-5 glass-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-1">Evolução dos últimos meses</p>
             <p className="text-[12px] text-muted-foreground mb-4">Receita, despesas e quanto guardou</p>
             <ResponsiveContainer width="100%" height={180}>
@@ -247,7 +247,7 @@ export default function ReportsPage() {
 
         {/* Month bar comparison */}
         {hasData && trendData.length > 1 && (
-          <div className="p-5 bg-card rounded-[22px]">
+          <div className="p-5 glass-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-4">Receita vs Despesas por mês</p>
             <ResponsiveContainer width="100%" height={150}>
               <BarChart data={trendData} barGap={2} margin={{ left: -20 }}>
@@ -264,7 +264,7 @@ export default function ReportsPage() {
 
         {/* Category breakdown for selected month */}
         {currentHasData && pieData.length > 0 && (
-          <div className="p-5 bg-card rounded-[22px]">
+          <div className="p-5 glass-card rounded-[22px]">
             <p className="font-semibold text-[15px] mb-4">
               Gastos por categoria — {currentSummary?.label}
             </p>
@@ -306,7 +306,7 @@ export default function ReportsPage() {
         )}
 
         {!hasData && (
-          <div className="flex flex-col items-center justify-center py-16 bg-card rounded-[22px] text-center">
+          <div className="flex flex-col items-center justify-center py-16 glass-card rounded-[22px] text-center">
             <BarChart2 className="w-8 h-8 text-muted-foreground opacity-40 mb-3" strokeWidth={1.6} />
             <p className="text-[15px] font-medium">{t.noData}</p>
             <p className="text-[13px] text-muted-foreground mt-1">{t.noDataDesc}</p>

@@ -129,7 +129,7 @@ export default function GoalsPage() {
 
           return (
             <div key={g.id} className={cn(
-              'p-5 bg-card rounded-[22px]',
+              'p-5 glass-card rounded-[22px]',
               g.completed && 'opacity-70'
             )}>
               <div className="flex items-start justify-between mb-4">

@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pointer-events-none nav-bottom px-4">
-      <div className="glass pointer-events-auto flex items-center gap-0.5 rounded-full border border-border p-1.5 shadow-2xl shadow-black/30">
+      <div className="glass pointer-events-auto flex items-center gap-0.5 rounded-full border border-border dark:border-white/15 p-1.5 shadow-2xl shadow-black/40">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active = pathname.startsWith(href)
           return (

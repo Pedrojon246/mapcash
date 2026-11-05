@@ -122,7 +122,7 @@ export default function BudgetPage() {
           const near = !over && pct >= 80
           const color = over ? 'hsl(var(--warn))' : near ? 'hsl(var(--warn))' : 'hsl(var(--foreground))'
           return (
-            <div key={b.id} className="p-5 bg-card rounded-[22px]">
+            <div key={b.id} className="p-5 glass-card rounded-[22px]">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="icon-tile"><CategoryIcon category={b.category} /></div>

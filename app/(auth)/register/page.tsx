@@ -44,7 +44,7 @@ export default function RegisterPage() {
   }
 
   if (done) return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background safe-top">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 safe-top">
       <div className="w-full max-w-sm text-center animate-scale-in">
         <div className="w-20 h-20 rounded-[26px] bg-card flex items-center justify-center mx-auto mb-6">
           <MailCheck className="w-9 h-9 text-foreground" strokeWidth={1.6} />
@@ -68,7 +68,7 @@ export default function RegisterPage() {
   )
 
   return (
-    <div className="min-h-screen flex flex-col bg-background safe-top">
+    <div className="min-h-screen flex flex-col safe-top">
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
         <div className="mb-8 text-center animate-fade-in">
           <Logo className="mx-auto mb-5" />

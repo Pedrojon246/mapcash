@@ -100,7 +100,7 @@ export default function NewGroupPage() {
           </div>
 
           {/* Preview */}
-          <div className="flex items-center gap-4 p-4 bg-card rounded-[22px]">
+          <div className="flex items-center gap-4 p-4 glass-card rounded-[22px]">
             <div className="icon-tile" style={{ width: 52, height: 52, borderRadius: 16 }}>
               <GlyphIcon glyph={emoji} className="w-6 h-6" />
             </div>

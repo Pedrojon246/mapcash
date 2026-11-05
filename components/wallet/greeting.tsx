@@ -125,7 +125,7 @@ export function Greeting() {
   const tone = type === 'warning' ? 'text-warn' : type === 'great' ? 'text-income' : 'text-foreground'
 
   return (
-    <div className="mx-5 mb-2 p-4 rounded-[22px] bg-card flex items-start gap-3.5 animate-slide-up">
+    <div className="mx-5 mb-2 p-4 rounded-[22px] glass-card flex items-start gap-3.5 animate-slide-up">
       <div className={`icon-tile ${tone}`}><Icon className="w-5 h-5" strokeWidth={1.8} /></div>
       <div className="min-w-0">
         <p className="text-[12px] font-medium text-muted-foreground">{getDayGreeting()} · {getTimeGreeting()}</p>

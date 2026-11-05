@@ -62,7 +62,7 @@ export function InstallCard({ className = '' }: { className?: string }) {
   }
 
   return (
-    <div className={`bg-card rounded-[22px] p-4 ${className}`}>
+    <div className={`glass-card rounded-[22px] p-4 ${className}`}>
       <div className="flex items-start gap-3.5">
         <div className="icon-tile"><Download className="w-5 h-5" strokeWidth={1.8} /></div>
         <div className="flex-1 min-w-0">

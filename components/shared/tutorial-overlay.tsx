@@ -37,7 +37,7 @@ export function TutorialOverlay({ screen, visible, onDismiss, onSkipAll }: Tutor
     >
       {/* Card */}
       <div className="w-full max-w-sm animate-bounce-in">
-        <div className="bg-card rounded-[28px] overflow-hidden shadow-2xl">
+        <div className="glass-card rounded-[28px] overflow-hidden shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between px-5 pt-5 pb-4">
             <div className="flex items-center gap-2">
@@ -120,7 +120,7 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
         onClick={e => e.target === e.currentTarget && (setSelected(null), setStep(0))}
       >
         <div className="w-full max-w-sm animate-slide-up mb-8 mx-5">
-          <div className="bg-card rounded-[28px] shadow-2xl overflow-hidden">
+          <div className="glass-card rounded-[28px] shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between px-5 pt-5 pb-4">
               <button onClick={() => { setSelected(null); setStep(0) }}
                 className="text-[15px] text-foreground font-medium pressable flex items-center gap-0.5">
@@ -173,7 +173,7 @@ export function TutorialsModal({ visible, onClose }: TutorialsModalProps) {
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <div className="w-full max-w-sm animate-slide-up mb-8 mx-5">
-        <div className="bg-card rounded-[28px] shadow-2xl overflow-hidden">
+        <div className="glass-card rounded-[28px] shadow-2xl overflow-hidden">
           <div className="flex items-center justify-between px-5 pt-5 pb-4">
             <div>
               <h2 className="text-[22px] font-bold tracking-tight">Tutoriais</h2>

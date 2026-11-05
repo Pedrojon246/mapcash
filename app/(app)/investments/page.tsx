@@ -82,7 +82,7 @@ export default function InvestmentsPage() {
               data?.indicators.map(ind => (
                 <button key={ind.name} type="button"
                   onClick={() => setExpanded(expanded === ind.name ? null : ind.name)}
-                  className={cn('p-4 bg-card rounded-[22px] text-left pressable', expanded === ind.name && 'ring-1 ring-foreground/30')}>
+                  className={cn('p-4 glass-card rounded-[22px] text-left pressable', expanded === ind.name && 'ring-1 ring-foreground/30')}>
                   {(() => { const I = INDICATOR_ICONS[ind.name] || Percent; return <I className="w-[18px] h-[18px] text-muted-foreground mb-3" strokeWidth={1.7} /> })()}
                   <p className="text-[12px] text-muted-foreground font-medium mb-0.5">{ind.name}</p>
                   <p className="text-[19px] font-bold tracking-tight tabular-nums">{ind.value}</p>
@@ -96,7 +96,7 @@ export default function InvestmentsPage() {
             const ind = data.indicators.find(i => i.name === expanded)
             if (!ind) return null
             return (
-              <div className="p-4 rounded-[22px] animate-slide-down bg-card">
+              <div className="p-4 rounded-[22px] animate-slide-down glass-card">
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div>
@@ -112,7 +112,7 @@ export default function InvestmentsPage() {
 
         {/* Link metas */}
         <Link href="/goals">
-          <div className="flex items-center gap-3.5 p-4 rounded-[22px] bg-card pressable">
+          <div className="flex items-center gap-3.5 p-4 rounded-[22px] glass-card pressable">
             <div className="icon-tile"><Target className="w-5 h-5" strokeWidth={1.8} /></div>
             <div className="flex-1">
               <p className="font-semibold text-[16px] tracking-tight">Minhas metas</p>
@@ -153,7 +153,7 @@ export default function InvestmentsPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-10 bg-card rounded-[22px]">
+            <div className="text-center py-10 glass-card rounded-[22px]">
               <Newspaper className="w-8 h-8 mx-auto mb-2 opacity-30" />
               <p className="text-[14px] text-muted-foreground">Indisponível no momento</p>
               <button onClick={() => load(true)} className="mt-2 text-[12px] text-foreground underline pressable">Tentar novamente</button>

@@ -34,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background safe-top">
+    <div className="min-h-screen flex flex-col safe-top">
       {/* Header */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
         {/* Logo */}
