@@ -13,7 +13,7 @@ import { useI18n } from '@/lib/i18n/context'
 import { formatCurrency, GOAL_COLORS, cn } from '@/lib/utils'
 import { GlyphIcon, GOAL_GLYPHS } from '@/components/ui/icons'
 import type { Goal } from '@/lib/supabase/types'
-import { Plus, CheckCircle2, Target, Pencil, PlusCircle, BookOpen, Loader2 } from 'lucide-react'
+import { Plus, CheckCircle2, Target, Pencil, PlusCircle, BookOpen, Loader2, Trash2 } from 'lucide-react'
 import { differenceInMonths, parseISO } from 'date-fns'
 import { AutoTutorial } from '@/components/shared/auto-tutorial'
 import { TutorialsModal } from '@/components/shared/tutorial-overlay'
@@ -25,6 +25,7 @@ export default function GoalsPage() {
   const [showForm, setShowForm] = useState(false)
   const [showContrib, setShowContrib] = useState<Goal | null>(null)
   const [editGoal, setEditGoal] = useState<Goal | null>(null)
+  const [deleteGoal, setDeleteGoal] = useState<Goal | null>(null)
   const [form, setForm] = useState({
     name: '', targetAmount: null as number | null,
     currentAmount: null as number | null, targetDate: '',
@@ -73,6 +74,15 @@ export default function GoalsPage() {
     if (error) toast({ variant: 'destructive', title: t.error })
     else { toast({ variant: 'success', title: 'Meta salva!' }); setShowForm(false); load() }
     setSaving(false)
+  }
+
+  async function handleDelete() {
+    if (!deleteGoal) return
+    setSaving(true)
+    const { error } = await supabase.from('goals').delete().eq('id', deleteGoal.id)
+    if (error) toast({ variant: 'destructive', title: t.error })
+    else { toast({ variant: 'success', title: 'Meta excluída' }); setGoals(gs => gs.filter(x => x.id !== deleteGoal.id)) }
+    setDeleteGoal(null); setSaving(false)
   }
 
   async function handleContrib(e: React.FormEvent) {
@@ -151,6 +161,9 @@ export default function GoalsPage() {
                   <button onClick={() => openForm(g)} className="p-2 rounded-full hover:bg-secondary pressable">
                     <Pencil className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />
                   </button>
+                  <button onClick={() => setDeleteGoal(g)} aria-label="Excluir meta" className="p-2 rounded-full hover:bg-secondary pressable">
+                    <Trash2 className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />
+                  </button>
                 </div>
               </div>
               <Progress value={pct} color={g.completed ? 'hsl(var(--income))' : 'hsl(var(--foreground))'} />
@@ -211,6 +224,24 @@ export default function GoalsPage() {
               <Button type="submit" disabled={saving || !form.targetAmount || !form.name} className="flex-1">{t.save}</Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <Dialog open={!!deleteGoal} onOpenChange={open => !open && setDeleteGoal(null)}>
+        <DialogContent>
+          <div className="space-y-4">
+            <h2 className="text-[20px] font-bold tracking-tight">Excluir meta?</h2>
+            <p className="text-sm text-muted-foreground">
+              A meta <strong className="text-foreground">{deleteGoal?.name}</strong> e o histórico de valores guardados serão apagados. Isso não pode ser desfeito.
+            </p>
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" onClick={() => setDeleteGoal(null)} className="flex-1">{t.cancel}</Button>
+              <Button type="button" variant="destructive" onClick={handleDelete} disabled={saving} className="flex-1">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Excluir'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

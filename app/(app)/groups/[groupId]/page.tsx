@@ -12,7 +12,8 @@ import { CurrencyInput } from '@/components/ui/currency-input'
 import { toast } from '@/components/ui/use-toast'
 import { useI18n } from '@/lib/i18n/context'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
-import { Plus, Copy, Check, Users, Receipt, Scale, Loader2, UserPlus, Mail } from 'lucide-react'
+import { Plus, Copy, Check, Users, Receipt, Scale, Loader2, UserPlus, Mail, Trash2, LogOut } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 
 interface Member {
@@ -56,6 +57,10 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
   const [saving, setSaving] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [sendingInvite, setSendingInvite] = useState(false)
+  const [createdBy, setCreatedBy] = useState<string | null>(null)
+  const [showLeave, setShowLeave] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const router = useRouter()
 
   const [expForm, setExpForm] = useState({
     description: '',
@@ -74,10 +79,10 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
     setCurrentUserId(user.id)
 
     const { data: grp } = await supabase
-      .from('groups').select('name, emoji, invite_token')
+      .from('groups').select('name, emoji, invite_token, created_by')
       .eq('id', groupId).single()
 
-    if (grp) { setGroupName(grp.name); setGroupEmoji(grp.emoji); setInviteToken(grp.invite_token) }
+    if (grp) { setGroupName(grp.name); setGroupEmoji(grp.emoji); setInviteToken(grp.invite_token); setCreatedBy(grp.created_by) }
 
     // Load members with names
     const { data: memberRows } = await supabase
@@ -127,6 +132,29 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
   }, [groupId, supabase])
 
   useEffect(() => { load() }, [load])
+
+  const isAdmin =
+    !!currentUserId &&
+    (createdBy === currentUserId || members.some(m => m.user_id === currentUserId && m.role === 'admin'))
+
+  async function handleLeaveOrDelete() {
+    if (!currentUserId) return
+    setLeaving(true)
+    if (isAdmin) {
+      const { data, error } = await supabase.from('groups').delete().eq('id', groupId).select('id')
+      if (error || !data || data.length === 0) {
+        toast({ variant: 'destructive', title: 'Não foi possível excluir o grupo', description: 'Rode o SQL 005 no Supabase.' })
+        setLeaving(false); return
+      }
+      toast({ variant: 'success', title: 'Grupo excluído' })
+    } else {
+      const { error } = await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', currentUserId)
+      if (error) { toast({ variant: 'destructive', title: t.error }); setLeaving(false); return }
+      toast({ variant: 'success', title: 'Você saiu do grupo' })
+    }
+    router.push('/groups')
+    router.refresh()
+  }
 
   async function copyInviteLink() {
     const url = `${window.location.origin}/join/${inviteToken}`
@@ -230,6 +258,10 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
             </Button>
             <Button size="icon" variant="outline" className="w-9 h-9" onClick={copyInviteLink} aria-label="Copiar link">
               {copied ? <Check className="w-4 h-4 text-income" /> : <Copy className="w-4 h-4" strokeWidth={1.8} />}
+            </Button>
+            <Button size="icon" variant="outline" className="w-9 h-9" onClick={() => setShowLeave(true)}
+              aria-label={isAdmin ? 'Excluir grupo' : 'Sair do grupo'}>
+              {isAdmin ? <Trash2 className="w-4 h-4" strokeWidth={1.8} /> : <LogOut className="w-4 h-4" strokeWidth={1.8} />}
             </Button>
           </div>
         }
@@ -417,6 +449,24 @@ export default function GroupDetailPage({ params }: { params: { groupId: string 
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showLeave} onOpenChange={open => !open && setShowLeave(false)}>
+        <DialogContent>
+          <div className="space-y-4">
+            <h2 className="text-[20px] font-bold tracking-tight">{isAdmin ? 'Excluir grupo?' : 'Sair do grupo?'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {isAdmin
+                ? <>O grupo <strong className="text-foreground">{groupName}</strong> será apagado para todos os membros, com gastos e saldos. Isso não pode ser desfeito.</>
+                : <>Você deixa de ver o grupo <strong className="text-foreground">{groupName}</strong>. Os gastos já lançados continuam para os outros membros.</>}
+            </p>
+            <div className="flex gap-2">
+              <Button type="button" variant="secondary" onClick={() => setShowLeave(false)} className="flex-1">{t.cancel}</Button>
+              <Button type="button" variant="destructive" onClick={handleLeaveOrDelete} disabled={leaving} className="flex-1">
+                {leaving ? <Loader2 className="w-4 h-4 animate-spin" /> : isAdmin ? 'Excluir' : 'Sair'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
