@@ -76,6 +76,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="w-full max-w-sm animate-slide-up">
+          <div className="glass-card rounded-[28px] p-5">
           <GoogleButton label="Cadastrar com Google" />
           <OrDivider />
           <form onSubmit={handleRegister} className="space-y-4">
@@ -95,6 +96,7 @@ export default function RegisterPage() {
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t.createFree}
             </Button>
           </form>
+          </div>
           <p className="text-center text-[14px] text-muted-foreground mt-6">
             {t.hasAccount}{' '}
             <Link href="/login" className="text-foreground font-semibold underline underline-offset-4">{t.login}</Link>

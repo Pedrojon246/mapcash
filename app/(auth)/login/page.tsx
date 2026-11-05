@@ -46,6 +46,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="w-full max-w-sm animate-slide-up">
+          <div className="glass-card rounded-[28px] p-5">
           <GoogleButton />
           <OrDivider />
           <form onSubmit={handleLogin} className="space-y-4">
@@ -75,6 +76,7 @@ export default function LoginPage() {
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t.login}
             </Button>
           </form>
+          </div>
 
           <p className="text-center text-[14px] text-muted-foreground mt-6">
             {t.noAccount}{' '}

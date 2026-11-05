@@ -39,7 +39,7 @@ export function GoogleButton({ label = 'Continuar com Google' }: { label?: strin
       type="button"
       onClick={handle}
       disabled={loading}
-      className="w-full h-[52px] rounded-2xl bg-secondary text-foreground font-semibold text-[16px] tracking-tight flex items-center justify-center gap-2.5 pressable disabled:opacity-60"
+      className="w-full h-[52px] rounded-2xl bg-secondary dark:bg-white/[0.06] dark:ring-1 dark:ring-inset dark:ring-white/[0.18] text-foreground font-semibold text-[16px] tracking-tight flex items-center justify-center gap-2.5 pressable disabled:opacity-60"
     >
       {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <GoogleMark />}
       {label}
